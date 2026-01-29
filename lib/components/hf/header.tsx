@@ -27,8 +27,17 @@ export default function Header() {
                     <Link href="/" className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50">
                         Home
                     </Link>
+                    <Link href="/get-started" className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50">
+                        Get Started
+                    </Link>
+                    <Link href="/features" className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50">
+                        Features
+                    </Link>
                     <Link href="/docs" className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50">
                         Docs
+                    </Link>
+                    <Link href="https://www.npmjs.com/package/notaify" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50">
+                        NPM
                     </Link>
                 </nav>
 
