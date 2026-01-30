@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 
 // I will just use standard HTML/Tailwind for now to be safe and avoid errors.
 
@@ -43,18 +44,23 @@ export default function Header() {
 
                 {/* Auth Buttons */}
                 <div className="flex items-center gap-4">
-                    <Link
-                        href="/login"
-                        className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50 hidden sm:block"
-                    >
-                        Login
-                    </Link>
-                    <Link
-                        href="/register"
-                        className="inline-flex h-9 items-center justify-center rounded-md bg-black px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-950 focus:ring-offset-2 dark:bg-white dark:text-black dark:hover:bg-gray-200"
-                    >
-                        Get Started
-                    </Link>
+                    <SignedOut>
+                        <Link
+                            href="/login"
+                            className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50 hidden sm:block"
+                        >
+                            Login
+                        </Link>
+                        <Link
+                            href="/register"
+                            className="inline-flex h-9 items-center justify-center rounded-md bg-black px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-950 focus:ring-offset-2 dark:bg-white dark:text-black dark:hover:bg-gray-200"
+                        >
+                            Sign Up
+                        </Link>
+                    </SignedOut>
+                    <SignedIn>
+                        <UserButton />
+                    </SignedIn>
                 </div>
             </div>
         </header>
