@@ -7,7 +7,7 @@ export default function LoginPage() {
                 <section className="relative hidden lg:block">
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(34,197,94,0.28),transparent_45%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.22),transparent_45%)]" />
                     <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0.8),rgba(0,0,0,0.8))]" />
-                    <div className="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.08)_1px,transparent_1px)] [background-size:16px_16px] opacity-60" />
+                    <div className="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.08)_1px,transparent_1px)] bg-size-[16px_16px] opacity-60" />
                     <div className="relative flex h-full flex-col justify-between px-10 py-12">
                         <div className="text-sm text-gray-300">← Home</div>
                         <div className="max-w-sm">
