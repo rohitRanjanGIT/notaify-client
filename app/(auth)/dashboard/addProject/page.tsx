@@ -139,7 +139,7 @@ export default function AddProjectPage() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-950 dark:to-black">
-      <div className="container mx-auto px-4 py-8 sm:py-12 sm:px-6 lg:px-8 max-w-3xl">
+      <div className="container mx-auto px-4 py-8 sm:py-12 sm:px-6 lg:px-8">
         {/* Header Section */}
         <div className="mb-8 text-center sm:text-left">
           <Link 
@@ -178,10 +178,10 @@ export default function AddProjectPage() {
         )}
 
         {/* Form Container */}
-        <form onSubmit={handleSubmit} className="rounded-xl border border-gray-200 bg-white shadow-lg dark:border-gray-800 dark:bg-gray-900/50 backdrop-blur-sm overflow-hidden">
+        <form onSubmit={handleSubmit} className="space-y-6">
           
-          {/* Project Name Section */}
-          <div className="p-6 sm:p-8 bg-gradient-to-br from-blue-50/50 to-transparent dark:from-blue-950/20 dark:to-transparent border-b border-gray-200 dark:border-gray-800">
+          {/* Project Name Section - Full Width */}
+          <div className="rounded-xl border border-gray-200 bg-white shadow-lg dark:border-gray-800 dark:bg-gray-900/50 backdrop-blur-sm p-6 sm:p-8 bg-gradient-to-br from-blue-50/50 to-transparent dark:from-blue-950/20 dark:to-transparent">
             <div className="flex items-center mb-4">
               <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mr-3">
                 <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -205,8 +205,11 @@ export default function AddProjectPage() {
             />
           </div>
 
-          {/* LLM Configuration Section */}
-          <div className="p-6 sm:p-8 border-b border-gray-200 dark:border-gray-800">
+          {/* Two Column Layout for LLM and Email Configuration */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            {/* LLM Configuration Section */}
+            <div className="rounded-xl border border-gray-200 bg-white shadow-lg dark:border-gray-800 dark:bg-gray-900/50 backdrop-blur-sm p-6 sm:p-8">
             <div className="flex items-center mb-6">
               <div className="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center mr-3">
                 <svg className="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -289,8 +292,8 @@ export default function AddProjectPage() {
             </div>
           </div>
 
-          {/* SMTP Configuration Section */}
-          <div className="p-6 sm:p-8">
+            {/* SMTP Configuration Section */}
+            <div className="rounded-xl border border-gray-200 bg-white shadow-lg dark:border-gray-800 dark:bg-gray-900/50 backdrop-blur-sm p-6 sm:p-8">
             <div className="flex items-center mb-6">
               <div className="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center mr-3">
                 <svg className="w-5 h-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -370,9 +373,11 @@ export default function AddProjectPage() {
               </div>
             </div>
           </div>
+          
+          </div>
 
-          {/* Action Buttons */}
-          <div className="px-6 sm:px-8 py-6 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-200 dark:border-gray-700 flex flex-col-reverse sm:flex-row justify-end gap-3">
+          {/* Action Buttons - Full Width */}
+          <div className="rounded-xl border border-gray-200 bg-white shadow-lg dark:border-gray-800 dark:bg-gray-900/50 backdrop-blur-sm px-6 sm:px-8 py-6 bg-gray-50 dark:bg-gray-800/50 flex flex-col-reverse sm:flex-row justify-end gap-3">
             <Link
               href="/dashboard"
               className="inline-flex items-center justify-center rounded-lg border-2 border-gray-300 bg-white px-6 py-3 text-sm font-medium text-gray-700 shadow-sm transition-all duration-200 hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:border-gray-500"
