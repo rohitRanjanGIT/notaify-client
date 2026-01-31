@@ -25,9 +25,6 @@ export default function Header() {
 
                 {/* Desktop Navigation */}
                 <nav className="hidden md:flex items-center gap-8">
-                    <Link href="/" className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50">
-                        Home
-                    </Link>
                     <Link href="/get-started" className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50">
                         Get Started
                     </Link>
@@ -39,6 +36,9 @@ export default function Header() {
                     </Link>
                     <Link href="https://www.npmjs.com/package/notaify" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50">
                         NPM
+                    </Link>
+                    <Link href="/dashboard" className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50">
+                        Dashboard
                     </Link>
                 </nav>
 
