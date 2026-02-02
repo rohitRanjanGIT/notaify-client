@@ -2,12 +2,15 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useAuth } from '@clerk/nextjs';
 import { ProjectConfig } from '@/lib/types/types';
 import Link from 'next/link';
+import ApiKeyDialog from '@/lib/components/dashboard/api-key-dialog';
 
 export default function AddProjectPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { userId } = useAuth();
   const projectId = searchParams.get('id');
   const isEditMode = Boolean(projectId);
   const [formData, setFormData] = useState<ProjectConfig>({
@@ -25,23 +28,61 @@ export default function AddProjectPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [showApiKeyDialog, setShowApiKeyDialog] = useState(false);
+  const [apiKeyDialogData, setApiKeyDialogData] = useState<{ projectId: string; projectName: string } | null>(null);
 
   useEffect(() => {
     if (!projectId) return;
 
-    try {
-      const stored = localStorage.getItem('projectConfigs');
-      const existing: ProjectConfig[] = stored ? JSON.parse(stored) : [];
-      const current = existing.find((p) => p.project_id === projectId);
-      if (current) {
-        setFormData({
-          ...current,
-          notaifyApiKey: current.notaifyApiKey ?? '',
-        });
+    const loadProjectConfig = async () => {
+      try {
+        console.log('Fetching project with ID:', projectId);
+        
+        // Fetch the specific project from backend
+        const response = await fetch(`/api/project/${projectId}`);
+        
+        console.log('Response status:', response.status);
+        console.log('Response OK:', response.ok);
+        
+        if (!response.ok) {
+          let errorData;
+          try {
+            errorData = await response.json();
+            console.error('API Error Response:', errorData);
+          } catch (e) {
+            const text = await response.text();
+            console.error('API Error (raw text):', text);
+            errorData = { error: text || `HTTP ${response.status}` };
+          }
+          throw new Error(errorData.error || 'Failed to fetch project');
+        }
+        
+        const { project } = await response.json();
+        
+        console.log('Project loaded:', project);
+        
+        if (project) {
+          setFormData({
+            project_id: project.id,  // Use the database ID
+            projectName: project.projectName || '',
+            llmType: project.llmType || '',
+            llmApiKey: project.llmApiKey || '',
+            llmApiModel: project.llmApiModel || '',
+            smtpUser: project.smtpUser || '',
+            smtpPass: project.smtpPass || '',
+            emailFrom: project.emailFrom || '',
+            emailTo: project.emailTo || '',
+            notaifyApiKey: project.notaifyApiKey || '',
+            notaifyApiKeyId: project.notaifyApiKeyId || '',
+          });
+        }
+      } catch (err) {
+        console.error('Failed to load project config:', err);
+        setError('Failed to load project data');
       }
-    } catch (err) {
-      console.error('Failed to load project config:', err);
-    }
+    };
+
+    loadProjectConfig();
   }, [projectId]);
 
   const handleChange = (
@@ -56,7 +97,49 @@ export default function AddProjectPage() {
     }));
   };
 
-  // Model options based on selected LLM type
+  const handleApiKeyGenerated = async (apiKey: string, apiKeyId: string) => {
+    // Update the project with the new API key via backend
+    try {
+      if (!apiKeyDialogData) return;
+
+      const response = await fetch('/api/project', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: apiKeyDialogData.projectId,
+          name: formData.projectName,
+          description: `Project: ${formData.projectName}`,
+          projectName: formData.projectName,
+          llmType: formData.llmType,
+          llmApiKey: formData.llmApiKey,
+          llmApiModel: formData.llmApiModel,
+          smtpUser: formData.smtpUser,
+          smtpPass: formData.smtpPass,
+          emailFrom: formData.emailFrom,
+          emailTo: formData.emailTo,
+          notaifyApiKey: apiKey,
+          notaifyApiKeyId: apiKeyId,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update API key');
+      }
+
+      console.log('API key saved to backend successfully');
+    } catch (err) {
+      console.error('Failed to update project with API key:', err);
+    }
+  };
+
+  const handleCloseApiKeyDialog = () => {
+    setShowApiKeyDialog(false);
+    setApiKeyDialogData(null);
+    setIsLoading(false);
+    // Redirect to dashboard after closing the dialog
+    setTimeout(() => router.push('/dashboard'), 500);
+  };
+
   const getModelOptions = () => {
     switch (formData.llmType) {
       case 'openai':
@@ -98,36 +181,77 @@ export default function AddProjectPage() {
     setError(null);
     setSuccess(null);
 
+    if (!userId) {
+      setError('User not authenticated');
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      const existingProjectsString = localStorage.getItem('projectConfigs');
-      const existingProjects: ProjectConfig[] = existingProjectsString ? JSON.parse(existingProjectsString) : [];
-
+      
       if (isEditMode && projectId) {
-        const updatedProjects = existingProjects.map((project) =>
-          project.project_id === projectId
-            ? {
-                ...project,
-                ...formData,
-                project_id: projectId,
-              }
-            : project
-        );
-        localStorage.setItem('projectConfigs', JSON.stringify(updatedProjects));
-        setSuccess('Project updated successfully!');
-      } else {
-        const projectWithId: ProjectConfig = {
-          ...formData,
-          project_id: Date.now().toString()
-        };
-        localStorage.setItem('projectConfigs', JSON.stringify([projectWithId, ...existingProjects]));
-        setSuccess('Project created successfully!');
-      }
+        // Update existing project via API
+        const response = await fetch('/api/project', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: projectId,
+            name: formData.projectName,
+            description: `Project: ${formData.projectName}`,
+            projectName: formData.projectName,
+            llmType: formData.llmType,
+            llmApiKey: formData.llmApiKey,
+            llmApiModel: formData.llmApiModel,
+            smtpUser: formData.smtpUser,
+            smtpPass: formData.smtpPass,
+            emailFrom: formData.emailFrom,
+            emailTo: formData.emailTo,
+            notaifyApiKey: formData.notaifyApiKey,
+            notaifyApiKeyId: formData.notaifyApiKeyId,
+          }),
+        });
 
-      setTimeout(() => router.push('/dashboard'), 1000);
+        if (!response.ok) {
+          throw new Error('Failed to update project');
+        }
+
+        const { project } = await response.json();
+        setSuccess('Project saved successfully! Now you can generate an API key.');
+        setApiKeyDialogData({ projectId: project.id, projectName: project.projectName });
+        setShowApiKeyDialog(true);
+      } else {
+        // Create new project via API
+        const response = await fetch('/api/project', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            user_id: userId,
+            name: formData.projectName,
+            description: `Project: ${formData.projectName}`,
+            projectName: formData.projectName,
+            llmType: formData.llmType,
+            llmApiKey: formData.llmApiKey,
+            llmApiModel: formData.llmApiModel,
+            smtpUser: formData.smtpUser,
+            smtpPass: formData.smtpPass,
+            emailFrom: formData.emailFrom,
+            emailTo: formData.emailTo,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to create project');
+        }
+
+        const { project } = await response.json();
+        setSuccess('Project saved successfully! Now you can generate an API key.');
+        setFormData({ ...formData, project_id: project.id });
+        setApiKeyDialogData({ projectId: project.id, projectName: project.projectName });
+        setShowApiKeyDialog(true);
+      }
     } catch (err) {
-      console.error('Failed to create project:', err);
-      setError('Failed to create project. Please try again.');
-    } finally {
+      console.error('Failed to save project:', err);
+      setError('Failed to save project. Please try again.');
       setIsLoading(false);
     }
   };
@@ -399,14 +523,14 @@ export default function AddProjectPage() {
                       <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
-                      Update Project
+                      Save & Create API Key
                     </>
                   ) : (
                     <>
                       <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                       </svg>
-                      Create Project
+                      Save & Create API Key
                     </>
                   )}
                 </>
@@ -414,6 +538,17 @@ export default function AddProjectPage() {
             </button>
           </div>
         </form>
+
+        {/* API Key Dialog */}
+        {apiKeyDialogData && (
+          <ApiKeyDialog
+            projectId={apiKeyDialogData.projectId}
+            projectName={apiKeyDialogData.projectName}
+            isOpen={showApiKeyDialog}
+            onClose={handleCloseApiKeyDialog}
+            onApiKeyGenerated={handleApiKeyGenerated}
+          />
+        )}
       </div>
     </main>
   );

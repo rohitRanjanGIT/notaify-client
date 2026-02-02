@@ -25,7 +25,7 @@ export default function ProjectCard({ project, onDelete, onUpdate }: ProjectCard
   const handleDelete = async () => {
     if (window.confirm(`Are you sure you want to delete "${project.projectName}"?`)) {
       setIsDeleting(true);
-      onDelete?.(project.id);
+      onDelete?.(project.project_id);
     }
   };
 
@@ -44,14 +44,14 @@ export default function ProjectCard({ project, onDelete, onUpdate }: ProjectCard
     <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-all hover:shadow-md dark:border-gray-800 dark:bg-gray-950">
       <div className="flex items-start justify-between">
         <div className="flex-1">
-          <Link href={`/dashboard/addProject?id=${project.id}`}>
+          <Link href={`/dashboard/addProject?id=${project.project_id}`}>
             <h3 className="text-lg font-semibold text-gray-900 hover:text-blue-600 dark:text-white dark:hover:text-blue-400">
               {project.projectName}
             </h3>
           </Link>
           <div className="mt-3 flex flex-wrap items-center gap-2">
             <Link
-              href={`/dashboard/addProject?id=${project.id}`}
+              href={`/dashboard/addProject?id=${project.project_id}`}
               className="inline-flex items-center gap-1 rounded-md border border-gray-200 px-2.5 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
             >
               <Pencil className="h-3.5 w-3.5" />

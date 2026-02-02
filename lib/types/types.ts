@@ -21,6 +21,7 @@ export interface ProjectConfig {
   emailTo?: string;
 
   notaifyApiKey?: string;
+  notaifyApiKeyId?: string;
 }
 
 export type ProjectWithConfig = Project & ProjectConfig;

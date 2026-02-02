@@ -38,6 +38,7 @@ export type ProjectMinAggregateOutputType = {
   emailFrom: string | null
   emailTo: string | null
   notaifyApiKey: string | null
+  notaifyApiKeyId: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -56,6 +57,7 @@ export type ProjectMaxAggregateOutputType = {
   emailFrom: string | null
   emailTo: string | null
   notaifyApiKey: string | null
+  notaifyApiKeyId: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -74,6 +76,7 @@ export type ProjectCountAggregateOutputType = {
   emailFrom: number
   emailTo: number
   notaifyApiKey: number
+  notaifyApiKeyId: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -94,6 +97,7 @@ export type ProjectMinAggregateInputType = {
   emailFrom?: true
   emailTo?: true
   notaifyApiKey?: true
+  notaifyApiKeyId?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -112,6 +116,7 @@ export type ProjectMaxAggregateInputType = {
   emailFrom?: true
   emailTo?: true
   notaifyApiKey?: true
+  notaifyApiKeyId?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -130,6 +135,7 @@ export type ProjectCountAggregateInputType = {
   emailFrom?: true
   emailTo?: true
   notaifyApiKey?: true
+  notaifyApiKeyId?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -221,6 +227,7 @@ export type ProjectGroupByOutputType = {
   emailFrom: string | null
   emailTo: string | null
   notaifyApiKey: string | null
+  notaifyApiKeyId: string | null
   createdAt: Date
   updatedAt: Date
   _count: ProjectCountAggregateOutputType | null
@@ -260,6 +267,7 @@ export type ProjectWhereInput = {
   emailFrom?: Prisma.StringNullableFilter<"Project"> | string | null
   emailTo?: Prisma.StringNullableFilter<"Project"> | string | null
   notaifyApiKey?: Prisma.StringNullableFilter<"Project"> | string | null
+  notaifyApiKeyId?: Prisma.StringNullableFilter<"Project"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Project"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Project"> | Date | string
 }
@@ -278,6 +286,7 @@ export type ProjectOrderByWithRelationInput = {
   emailFrom?: Prisma.SortOrderInput | Prisma.SortOrder
   emailTo?: Prisma.SortOrderInput | Prisma.SortOrder
   notaifyApiKey?: Prisma.SortOrderInput | Prisma.SortOrder
+  notaifyApiKeyId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -299,6 +308,7 @@ export type ProjectWhereUniqueInput = Prisma.AtLeast<{
   emailFrom?: Prisma.StringNullableFilter<"Project"> | string | null
   emailTo?: Prisma.StringNullableFilter<"Project"> | string | null
   notaifyApiKey?: Prisma.StringNullableFilter<"Project"> | string | null
+  notaifyApiKeyId?: Prisma.StringNullableFilter<"Project"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Project"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Project"> | Date | string
 }, "id">
@@ -317,6 +327,7 @@ export type ProjectOrderByWithAggregationInput = {
   emailFrom?: Prisma.SortOrderInput | Prisma.SortOrder
   emailTo?: Prisma.SortOrderInput | Prisma.SortOrder
   notaifyApiKey?: Prisma.SortOrderInput | Prisma.SortOrder
+  notaifyApiKeyId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.ProjectCountOrderByAggregateInput
@@ -341,6 +352,7 @@ export type ProjectScalarWhereWithAggregatesInput = {
   emailFrom?: Prisma.StringNullableWithAggregatesFilter<"Project"> | string | null
   emailTo?: Prisma.StringNullableWithAggregatesFilter<"Project"> | string | null
   notaifyApiKey?: Prisma.StringNullableWithAggregatesFilter<"Project"> | string | null
+  notaifyApiKeyId?: Prisma.StringNullableWithAggregatesFilter<"Project"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Project"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Project"> | Date | string
 }
@@ -359,6 +371,7 @@ export type ProjectCreateInput = {
   emailFrom?: string | null
   emailTo?: string | null
   notaifyApiKey?: string | null
+  notaifyApiKeyId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -377,6 +390,7 @@ export type ProjectUncheckedCreateInput = {
   emailFrom?: string | null
   emailTo?: string | null
   notaifyApiKey?: string | null
+  notaifyApiKeyId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -395,6 +409,7 @@ export type ProjectUpdateInput = {
   emailFrom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notaifyApiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notaifyApiKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -413,6 +428,7 @@ export type ProjectUncheckedUpdateInput = {
   emailFrom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notaifyApiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notaifyApiKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -431,6 +447,7 @@ export type ProjectCreateManyInput = {
   emailFrom?: string | null
   emailTo?: string | null
   notaifyApiKey?: string | null
+  notaifyApiKeyId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -449,6 +466,7 @@ export type ProjectUpdateManyMutationInput = {
   emailFrom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notaifyApiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notaifyApiKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -467,6 +485,7 @@ export type ProjectUncheckedUpdateManyInput = {
   emailFrom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notaifyApiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notaifyApiKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -485,6 +504,7 @@ export type ProjectCountOrderByAggregateInput = {
   emailFrom?: Prisma.SortOrder
   emailTo?: Prisma.SortOrder
   notaifyApiKey?: Prisma.SortOrder
+  notaifyApiKeyId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -503,6 +523,7 @@ export type ProjectMaxOrderByAggregateInput = {
   emailFrom?: Prisma.SortOrder
   emailTo?: Prisma.SortOrder
   notaifyApiKey?: Prisma.SortOrder
+  notaifyApiKeyId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -521,6 +542,7 @@ export type ProjectMinOrderByAggregateInput = {
   emailFrom?: Prisma.SortOrder
   emailTo?: Prisma.SortOrder
   notaifyApiKey?: Prisma.SortOrder
+  notaifyApiKeyId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -557,6 +579,7 @@ export type ProjectSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   emailFrom?: boolean
   emailTo?: boolean
   notaifyApiKey?: boolean
+  notaifyApiKeyId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["project"]>
@@ -575,6 +598,7 @@ export type ProjectSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   emailFrom?: boolean
   emailTo?: boolean
   notaifyApiKey?: boolean
+  notaifyApiKeyId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["project"]>
@@ -593,6 +617,7 @@ export type ProjectSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   emailFrom?: boolean
   emailTo?: boolean
   notaifyApiKey?: boolean
+  notaifyApiKeyId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["project"]>
@@ -611,11 +636,12 @@ export type ProjectSelectScalar = {
   emailFrom?: boolean
   emailTo?: boolean
   notaifyApiKey?: boolean
+  notaifyApiKeyId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type ProjectOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "user_id" | "name" | "description" | "projectName" | "llmType" | "llmApiKey" | "llmApiModel" | "smtpUser" | "smtpPass" | "emailFrom" | "emailTo" | "notaifyApiKey" | "createdAt" | "updatedAt", ExtArgs["result"]["project"]>
+export type ProjectOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "user_id" | "name" | "description" | "projectName" | "llmType" | "llmApiKey" | "llmApiModel" | "smtpUser" | "smtpPass" | "emailFrom" | "emailTo" | "notaifyApiKey" | "notaifyApiKeyId" | "createdAt" | "updatedAt", ExtArgs["result"]["project"]>
 
 export type $ProjectPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Project"
@@ -634,6 +660,7 @@ export type $ProjectPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     emailFrom: string | null
     emailTo: string | null
     notaifyApiKey: string | null
+    notaifyApiKeyId: string | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["project"]>
@@ -1072,6 +1099,7 @@ export interface ProjectFieldRefs {
   readonly emailFrom: Prisma.FieldRef<"Project", 'String'>
   readonly emailTo: Prisma.FieldRef<"Project", 'String'>
   readonly notaifyApiKey: Prisma.FieldRef<"Project", 'String'>
+  readonly notaifyApiKeyId: Prisma.FieldRef<"Project", 'String'>
   readonly createdAt: Prisma.FieldRef<"Project", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Project", 'DateTime'>
 }

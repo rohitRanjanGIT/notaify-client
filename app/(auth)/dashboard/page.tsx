@@ -1,47 +1,79 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useAuth } from '@clerk/nextjs';
 import { ProjectConfig } from '@/lib/types/types';
 import ProjectCard from '@/lib/components/dashboard/project-card';
 import Link from 'next/link';
 import { Plus } from 'lucide-react';
 
 export default function DashboardPage() {
+  const { userId } = useAuth();
   const [projects, setProjects] = useState<ProjectConfig[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Load projects from localStorage (for now)
+  // Load projects from backend
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem('projectConfigs');
-      if (stored) {
-        setProjects(JSON.parse(stored));
+    const fetchProjects = async () => {
+      if (!userId) return;
+
+      try {
+        
+        const response = await fetch(`/api/project?userId=${userId}`);
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch projects');
+        }
+        
+        const { projects: fetchedProjects } = await response.json();
+        
+        // Transform backend data to match ProjectConfig
+        const transformedProjects: ProjectConfig[] = fetchedProjects.map((p: any) => ({
+          project_id: p.id,
+          projectName: p.projectName,
+          llmType: p.llmType || '',
+          llmApiKey: p.llmApiKey || '',
+          llmApiModel: p.llmApiModel || '',
+          smtpUser: p.smtpUser || '',
+          smtpPass: p.smtpPass || '',
+          emailFrom: p.emailFrom || '',
+          emailTo: p.emailTo || '',
+          notaifyApiKey: p.notaifyApiKey || '',
+          notaifyApiKeyId: p.notaifyApiKeyId || '',
+        }));
+        
+        setProjects(transformedProjects);
+      } catch (err) {
+        console.error('Error loading projects:', err);
+        setError('Failed to load projects from server');
+      } finally {
+        setIsLoading(false);
       }
-    } catch (err) {
-      console.error('Error loading projects:', err);
-    } finally {
-      setIsLoading(false);
-    }
+    };
+
+    fetchProjects();
   }, []);
 
-  // Save projects to localStorage
-  const saveProjects = (updatedProjects: ProjectConfig[]) => {
+  const handleDeleteProject = async (id: string) => {
     try {
-      localStorage.setItem('projectConfigs', JSON.stringify(updatedProjects));
-      setProjects(updatedProjects);
-    } catch (err) {
-      console.error('Error saving projects:', err);
-      setError('Failed to save projects');
-    }
-  };
+      const response = await fetch(`/api/project?id=${id}`, {
+        method: 'DELETE',
+      });
 
-  const handleDeleteProject = (id: string) => {
-    saveProjects(projects.filter((p) => p.id !== id));
+      if (!response.ok) {
+        throw new Error('Failed to delete project');
+      }
+
+      setProjects(projects.filter((p) => p.project_id !== id));
+    } catch (err) {
+      console.error('Error deleting project:', err);
+      setError('Failed to delete project');
+    }
   };
 
   const handleUpdateProject = (updated: ProjectConfig) => {
-    saveProjects(projects.map((project) => (project.id === updated.id ? updated : project)));
+    setProjects(projects.map((project) => (project.project_id === updated.project_id ? updated : project)));
   };
 
   return (
@@ -91,7 +123,7 @@ export default function DashboardPage() {
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {projects.map((project) => (
               <ProjectCard
-                key={project.id}
+                key={project.project_id}
                 project={project}
                 onDelete={handleDeleteProject}
                 onUpdate={handleUpdateProject}

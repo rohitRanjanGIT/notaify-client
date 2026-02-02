@@ -84,6 +84,7 @@ export const ProjectScalarFieldEnum = {
   emailFrom: 'emailFrom',
   emailTo: 'emailTo',
   notaifyApiKey: 'notaifyApiKey',
+  notaifyApiKeyId: 'notaifyApiKeyId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
