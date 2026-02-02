@@ -1,0 +1,40 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+enum LlmType {
+  openai
+  claude
+  google
+}
+
+model Project {
+  id             String   @id @default(uuid())
+  user_id        String
+  name           String
+  description    String
+
+  // project config
+  projectName    String
+  llmType        LlmType?
+  llmApiKey      String?
+  llmApiModel    String?
+
+  smtpUser       String?
+  smtpPass       String?
+  emailFrom      String?
+  emailTo        String?
+
+  notaifyApiKey  String?
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("projects")
+}
