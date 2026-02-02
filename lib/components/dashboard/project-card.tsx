@@ -35,7 +35,7 @@ export default function ProjectCard({ project, onDelete, onUpdate }: ProjectCard
     onUpdate?.({
       ...project,
       notaifyApiKey: newKey,
-      updatedAt: new Date().toISOString(),
+      updatedAt: new Date(),
     });
     setIsGeneratingKey(false);
   };

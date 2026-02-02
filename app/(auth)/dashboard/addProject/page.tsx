@@ -29,7 +29,12 @@ export default function AddProjectPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [showApiKeyDialog, setShowApiKeyDialog] = useState(false);
+  const [showNewApiKeyDialog, setShowNewApiKeyDialog] = useState(false);
   const [apiKeyDialogData, setApiKeyDialogData] = useState<{ projectId: string; projectName: string } | null>(null);
+  const [newlyGeneratedKey, setNewlyGeneratedKey] = useState<{ apiKey: string; apiKeyId: string } | null>(null);
+  const [isRegenerating, setIsRegenerating] = useState(false);
+  const [visibleApiKey, setVisibleApiKey] = useState(false);
+  const [originalFormData, setOriginalFormData] = useState<ProjectConfig | null>(null);
 
   useEffect(() => {
     if (!projectId) return;
@@ -62,8 +67,8 @@ export default function AddProjectPage() {
         console.log('Project loaded:', project);
         
         if (project) {
-          setFormData({
-            project_id: project.id,  // Use the database ID
+          const loadedData = {
+            project_id: project.id,
             projectName: project.projectName || '',
             llmType: project.llmType || '',
             llmApiKey: project.llmApiKey || '',
@@ -74,7 +79,9 @@ export default function AddProjectPage() {
             emailTo: project.emailTo || '',
             notaifyApiKey: project.notaifyApiKey || '',
             notaifyApiKeyId: project.notaifyApiKeyId || '',
-          });
+          };
+          setFormData(loadedData);
+          setOriginalFormData(loadedData);
         }
       } catch (err) {
         console.error('Failed to load project config:', err);
@@ -126,9 +133,81 @@ export default function AddProjectPage() {
         throw new Error('Failed to update API key');
       }
 
+      // Update form data with new keys
+      setFormData((prev) => ({
+        ...prev,
+        notaifyApiKey: apiKey,
+        notaifyApiKeyId: apiKeyId,
+      }));
+
+      setNewlyGeneratedKey({ apiKey, apiKeyId });
+      setShowNewApiKeyDialog(true);
+      setShowApiKeyDialog(false);
+
       console.log('API key saved to backend successfully');
     } catch (err) {
-      console.error('Failed to update project with API key:', err);
+      console.error('Error updating API key:', err);
+      setError('Failed to save API key');
+    }
+  };
+
+  const handleRegenerateApiKey = async () => {
+    if (!formData.project_id) return;
+    setIsRegenerating(true);
+
+    try {
+      // Generate new API key
+      const generateResponse = await fetch('/api/generateApiKey', {
+        method: 'POST',
+      });
+
+      if (!generateResponse.ok) {
+        throw new Error('Failed to generate API key');
+      }
+
+      const { apiKey, apiKeyId } = await generateResponse.json();
+
+      // Update project with new API key
+      const updateResponse = await fetch('/api/project', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: formData.project_id,
+          name: formData.projectName,
+          description: `Project: ${formData.projectName}`,
+          projectName: formData.projectName,
+          llmType: formData.llmType,
+          llmApiKey: formData.llmApiKey,
+          llmApiModel: formData.llmApiModel,
+          smtpUser: formData.smtpUser,
+          smtpPass: formData.smtpPass,
+          emailFrom: formData.emailFrom,
+          emailTo: formData.emailTo,
+          notaifyApiKey: apiKey,
+          notaifyApiKeyId: apiKeyId,
+        }),
+      });
+
+      if (!updateResponse.ok) {
+        throw new Error('Failed to update project with new API key');
+      }
+
+      // Update form data
+      setFormData((prev) => ({
+        ...prev,
+        notaifyApiKey: apiKey,
+        notaifyApiKeyId: apiKeyId,
+      }));
+
+      setNewlyGeneratedKey({ apiKey, apiKeyId });
+      setShowNewApiKeyDialog(true);
+      setVisibleApiKey(true);
+      setSuccess('API key regenerated successfully!');
+    } catch (err) {
+      console.error('Error regenerating API key:', err);
+      setError('Failed to regenerate API key');
+    } finally {
+      setIsRegenerating(false);
     }
   };
 
@@ -188,8 +267,25 @@ export default function AddProjectPage() {
     }
 
     try {
-      
       if (isEditMode && projectId) {
+        // Check if data has changed
+        const hasChanges = originalFormData && (
+          formData.projectName !== originalFormData.projectName ||
+          formData.llmType !== originalFormData.llmType ||
+          formData.llmApiKey !== originalFormData.llmApiKey ||
+          formData.llmApiModel !== originalFormData.llmApiModel ||
+          formData.smtpUser !== originalFormData.smtpUser ||
+          formData.smtpPass !== originalFormData.smtpPass ||
+          formData.emailFrom !== originalFormData.emailFrom ||
+          formData.emailTo !== originalFormData.emailTo
+        );
+
+        if (!hasChanges) {
+          setSuccess('No changes detected.');
+          setIsLoading(false);
+          return;
+        }
+
         // Update existing project via API
         const response = await fetch('/api/project', {
           method: 'PUT',
@@ -215,12 +311,12 @@ export default function AddProjectPage() {
           throw new Error('Failed to update project');
         }
 
-        const { project } = await response.json();
-        setSuccess('Project saved successfully! Now you can generate an API key.');
-        setApiKeyDialogData({ projectId: project.id, projectName: project.projectName });
-        setShowApiKeyDialog(true);
+        setSuccess('Project updated successfully!');
+        setOriginalFormData(formData);
+        setIsLoading(false);
+        setTimeout(() => router.push('/dashboard'), 1000);
       } else {
-        // Create new project via API
+        // Create new project via API - only send necessary fields
         const response = await fetch('/api/project', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -229,13 +325,13 @@ export default function AddProjectPage() {
             name: formData.projectName,
             description: `Project: ${formData.projectName}`,
             projectName: formData.projectName,
-            llmType: formData.llmType,
-            llmApiKey: formData.llmApiKey,
-            llmApiModel: formData.llmApiModel,
-            smtpUser: formData.smtpUser,
-            smtpPass: formData.smtpPass,
-            emailFrom: formData.emailFrom,
-            emailTo: formData.emailTo,
+            llmType: formData.llmType || null,
+            llmApiKey: formData.llmApiKey || null,
+            llmApiModel: formData.llmApiModel || null,
+            smtpUser: formData.smtpUser || null,
+            smtpPass: formData.smtpPass || null,
+            emailFrom: formData.emailFrom || null,
+            emailTo: formData.emailTo || null,
           }),
         });
 
@@ -244,10 +340,55 @@ export default function AddProjectPage() {
         }
 
         const { project } = await response.json();
-        setSuccess('Project saved successfully! Now you can generate an API key.');
-        setFormData({ ...formData, project_id: project.id });
-        setApiKeyDialogData({ projectId: project.id, projectName: project.projectName });
-        setShowApiKeyDialog(true);
+
+        // Auto-generate API key for new project
+        const generateResponse = await fetch('/api/generateApiKey', {
+          method: 'POST',
+        });
+
+        if (!generateResponse.ok) {
+          throw new Error('Failed to generate API key');
+        }
+
+        const { apiKey, apiKeyId } = await generateResponse.json();
+
+        // Update project with generated API key
+        const updateResponse = await fetch('/api/project', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: project.id,
+            name: formData.projectName,
+            description: `Project: ${formData.projectName}`,
+            projectName: formData.projectName,
+            llmType: formData.llmType || null,
+            llmApiKey: formData.llmApiKey || null,
+            llmApiModel: formData.llmApiModel || null,
+            smtpUser: formData.smtpUser || null,
+            smtpPass: formData.smtpPass || null,
+            emailFrom: formData.emailFrom || null,
+            emailTo: formData.emailTo || null,
+            notaifyApiKey: apiKey,
+            notaifyApiKeyId: apiKeyId,
+          }),
+        });
+
+        if (!updateResponse.ok) {
+          throw new Error('Failed to save API key');
+        }
+
+        // Store newly generated key to show in dialog
+        setNewlyGeneratedKey({ apiKey, apiKeyId });
+        setFormData({ 
+          ...formData, 
+          project_id: project.id, 
+          notaifyApiKey: apiKey, 
+          notaifyApiKeyId: apiKeyId 
+        });
+        setSuccess('Project created successfully! API key has been auto-generated.');
+        setVisibleApiKey(true);
+        setShowNewApiKeyDialog(true);
+        setIsLoading(false);
       }
     } catch (err) {
       console.error('Failed to save project:', err);
@@ -492,6 +633,114 @@ export default function AddProjectPage() {
               </div>
             </div>
           </div>
+
+          {/* API Key Section - Only shown in edit mode or after creation */}
+          {isEditMode && formData.notaifyApiKeyId && (
+            <div className="rounded-xl border border-gray-200 bg-white shadow-lg dark:border-gray-800 dark:bg-gray-900/50 backdrop-blur-sm p-6 sm:p-8">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center">
+                  <div className="w-10 h-10 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center mr-3">
+                    <svg className="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                    </svg>
+                  </div>
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Notaify API Key</h2>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleRegenerateApiKey}
+                  disabled={isRegenerating}
+                  className="inline-flex items-center justify-center gap-2 rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  {isRegenerating ? (
+                    <>
+                      <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Regenerating...
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                      </svg>
+                      Regenerate Key
+                    </>
+                  )}
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                {/* API ID */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">API ID</label>
+                  <div className="flex items-center gap-2">
+                    <code className="flex-1 rounded bg-gray-100 dark:bg-gray-800 px-4 py-3 font-mono text-sm text-gray-900 dark:text-white">
+                      {formData.notaifyApiKeyId}
+                    </code>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard.writeText(formData.notaifyApiKeyId || '');
+                        setSuccess('API ID copied to clipboard');
+                      }}
+                      className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2"
+                      title="Copy API ID"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                {/* API Key */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">API Key (Secret)</label>
+                  <div className="flex items-center gap-2">
+                    <code className="flex-1 rounded bg-gray-100 dark:bg-gray-800 px-4 py-3 font-mono text-sm text-gray-900 dark:text-white">
+                      {visibleApiKey && formData.notaifyApiKey ? formData.notaifyApiKey : (formData.notaifyApiKey ? '•'.repeat(Math.min(formData.notaifyApiKey.length, 20)) : '-')}
+                    </code>
+                    {formData.notaifyApiKey && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => setVisibleApiKey(!visibleApiKey)}
+                          className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2"
+                          title={visibleApiKey ? 'Hide API Key' : 'Show API Key'}
+                        >
+                          {visibleApiKey ? (
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-4.803m5.596-3.856a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0z" />
+                            </svg>
+                          ) : (
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                          )}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard.writeText(formData.notaifyApiKey || '');
+                            setSuccess('API Key copied to clipboard');
+                          }}
+                          className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2"
+                          title="Copy API Key"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                          </svg>
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
           
           </div>
 
@@ -523,14 +772,14 @@ export default function AddProjectPage() {
                       <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
-                      Save & Create API Key
+                      Update Project
                     </>
                   ) : (
                     <>
                       <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                       </svg>
-                      Save & Create API Key
+                      Create Project & Generate API Key
                     </>
                   )}
                 </>
@@ -548,6 +797,97 @@ export default function AddProjectPage() {
             onClose={handleCloseApiKeyDialog}
             onApiKeyGenerated={handleApiKeyGenerated}
           />
+        )}
+
+        {/* New API Key Success Dialog */}
+        {showNewApiKeyDialog && newlyGeneratedKey && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl max-w-md w-full p-6 animate-in">
+              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 mx-auto mb-4">
+                <svg className="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white text-center mb-2">
+                API Key Generated Successfully
+              </h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400 text-center mb-4">
+                Your API key has been created. Save it in a secure location as you won&apos;t be able to see it again.
+              </p>
+
+              <div className="space-y-3 mb-6">
+                {/* API ID */}
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">API ID</label>
+                  <div className="flex items-center gap-2">
+                    <code className="flex-1 rounded bg-gray-100 dark:bg-gray-800 px-3 py-2 text-sm font-mono text-gray-900 dark:text-white break-all">
+                      {newlyGeneratedKey.apiKeyId}
+                    </code>
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(newlyGeneratedKey.apiKeyId);
+                        setSuccess('API ID copied to clipboard');
+                      }}
+                      className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                {/* API Key */}
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">API Key (Secret)</label>
+                  <div className="flex items-center gap-2">
+                    <code className="flex-1 rounded bg-gray-100 dark:bg-gray-800 px-3 py-2 text-sm font-mono text-gray-900 dark:text-white break-all">
+                      {visibleApiKey ? newlyGeneratedKey.apiKey : '•'.repeat(Math.min(newlyGeneratedKey.apiKey.length, 20))}
+                    </code>
+                    <button
+                      onClick={() => setVisibleApiKey(!visibleApiKey)}
+                      className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                    >
+                      {visibleApiKey ? (
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-4.803m5.596-3.856a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0z" />
+                        </svg>
+                      ) : (
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                      )}
+                    </button>
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(newlyGeneratedKey.apiKey);
+                        setSuccess('API Key copied to clipboard');
+                      }}
+                      className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                onClick={() => {
+                  setShowNewApiKeyDialog(false);
+                  setNewlyGeneratedKey(null);
+                  if (!isEditMode) {
+                    setTimeout(() => router.push('/dashboard'), 500);
+                  }
+                }}
+                className="w-full rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 transition-colors"
+              >
+                {isEditMode ? 'Done' : 'Go to Dashboard'}
+              </button>
+            </div>
+          </div>
         )}
       </div>
     </main>

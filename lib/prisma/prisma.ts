@@ -13,7 +13,7 @@ const createPrismaClient = () => {
 
     return new PrismaClient({
         adapter,
-        log: ["query", "error"],
+        log: ["error"],
     });
 };
 

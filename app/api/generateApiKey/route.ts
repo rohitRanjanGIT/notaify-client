@@ -4,28 +4,16 @@ import crypto from 'crypto';
 export async function POST(request: NextRequest) {
     try {
         console.log('API Route called - generateApiKey');
-        const body = await request.json();
-        console.log('Request body:', body);
 
-        const { projectId, projectName } = body;
-
-        if (!projectId || !projectName) {
-            console.log('Missing projectId or projectName:', { projectId, projectName });
-            return NextResponse.json(
-                { error: 'Missing projectId or projectName' },
-                { status: 400 }
-            );
-        }
-
-        // Generate API Key ID (display-friendly identifier)
+        // Generate API Key ID (random identifier)
         const timestamp = Date.now().toString().slice(-6);
-        const cleaned = projectName.replace(/[^a-z0-9]/gi, '').slice(0, 8);
-        const apiKeyId = `ntf_${cleaned.toLowerCase()}_${timestamp}`;
+        const randomPart1 = crypto.randomBytes(3).toString('hex');
+        const apiKeyId = `nty_${randomPart1}_${timestamp}`;
 
-        // Generate secret API key: ntf_XXXXXXXXXXXXXX (max 18 chars)
-        // ntf_ (4 chars) + 14 random hex chars = 18 chars total
-        const randomPart = crypto.randomBytes(7).toString('hex');
-        const apiKey = `ntf_${randomPart}`;
+        // Generate secret API key: nty_XXXXXXXXXXXXXX (max 18 chars)
+        // nty_ (4 chars) + 14 random hex chars = 18 chars total
+        const randomPart2 = crypto.randomBytes(7).toString('hex');
+        const apiKey = `nty_${randomPart2}`;
 
         console.log('API Key ID and secret generated successfully');
         return NextResponse.json({ apiKeyId, apiKey }, { status: 200 });

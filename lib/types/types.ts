@@ -10,6 +10,7 @@ export interface Project {
 export interface ProjectConfig {
   project_id: string;
   projectName: string;
+  description?: string;
 
   llmType?: "openai" | "claude" | "google" | "";
   llmApiKey?: string;
@@ -22,6 +23,9 @@ export interface ProjectConfig {
 
   notaifyApiKey?: string;
   notaifyApiKeyId?: string;
+
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export type ProjectWithConfig = Project & ProjectConfig;
