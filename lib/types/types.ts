@@ -22,3 +22,5 @@ export interface ProjectConfig {
 
   notaifyApiKey?: string;
 }
+
+export type ProjectWithConfig = Project & ProjectConfig;
