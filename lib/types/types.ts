@@ -1,5 +1,5 @@
 export interface Project {
-  id: string;
+  project_id: string;
   user_id: string;
   name: string;
   description: string;
@@ -8,6 +8,7 @@ export interface Project {
 }
 
 export interface ProjectConfig {
+  project_id: string;
   projectName: string;
 
   llmType?: "openai" | "claude" | "google" | "";

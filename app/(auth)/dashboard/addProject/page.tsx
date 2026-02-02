@@ -11,7 +11,7 @@ export default function AddProjectPage() {
   const projectId = searchParams.get('id');
   const isEditMode = Boolean(projectId);
   const [formData, setFormData] = useState<ProjectConfig>({
-    id: '',
+    project_id: '',
     llmType: '',
     llmApiKey: '',
     llmApiModel: '',
@@ -21,8 +21,6 @@ export default function AddProjectPage() {
     emailTo: '',
     projectName: '',
     notaifyApiKey: '',
-    createdAt: undefined,
-    updatedAt: undefined,
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -34,7 +32,7 @@ export default function AddProjectPage() {
     try {
       const stored = localStorage.getItem('projectConfigs');
       const existing: ProjectConfig[] = stored ? JSON.parse(stored) : [];
-      const current = existing.find((p) => p.id === projectId);
+      const current = existing.find((p) => p.project_id === projectId);
       if (current) {
         setFormData({
           ...current,
@@ -106,12 +104,11 @@ export default function AddProjectPage() {
 
       if (isEditMode && projectId) {
         const updatedProjects = existingProjects.map((project) =>
-          project.id === projectId
+          project.project_id === projectId
             ? {
                 ...project,
                 ...formData,
-                id: projectId,
-                updatedAt: new Date().toISOString(),
+                project_id: projectId,
               }
             : project
         );
@@ -120,9 +117,7 @@ export default function AddProjectPage() {
       } else {
         const projectWithId: ProjectConfig = {
           ...formData,
-          id: Date.now().toString(),
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
+          project_id: Date.now().toString()
         };
         localStorage.setItem('projectConfigs', JSON.stringify([projectWithId, ...existingProjects]));
         setSuccess('Project created successfully!');
@@ -138,7 +133,7 @@ export default function AddProjectPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-950 dark:to-black">
+    <main className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-950 dark:to-black">
       <div className="container mx-auto px-4 py-8 sm:py-12 sm:px-6 lg:px-8">
         {/* Header Section */}
         <div className="mb-8 text-center sm:text-left">
@@ -162,7 +157,7 @@ export default function AddProjectPage() {
         {/* Alert Messages */}
         {error && (
           <div className="mb-6 rounded-lg bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/50 p-4 flex items-start animate-in slide-in-from-top-2 duration-300">
-            <svg className="w-5 h-5 text-red-600 dark:text-red-400 mt-0.5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <svg className="w-5 h-5 text-red-600 dark:text-red-400 mt-0.5 mr-3 shrink-0" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
             </svg>
             <span className="text-sm font-medium text-red-800 dark:text-red-400">{error}</span>
@@ -170,7 +165,7 @@ export default function AddProjectPage() {
         )}
         {success && (
           <div className="mb-6 rounded-lg bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-900/50 p-4 flex items-start animate-in slide-in-from-top-2 duration-300">
-            <svg className="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <svg className="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5 mr-3 shrink-0" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
             </svg>
             <span className="text-sm font-medium text-green-800 dark:text-green-400">{success}</span>
@@ -181,7 +176,7 @@ export default function AddProjectPage() {
         <form onSubmit={handleSubmit} className="space-y-6">
           
           {/* Project Name Section - Full Width */}
-          <div className="rounded-xl border border-gray-200 bg-white shadow-lg dark:border-gray-800 dark:bg-gray-900/50 backdrop-blur-sm p-6 sm:p-8 bg-gradient-to-br from-blue-50/50 to-transparent dark:from-blue-950/20 dark:to-transparent">
+          <div className="rounded-xl border border-gray-200 bg-white shadow-lg dark:border-gray-800 dark:bg-gray-900/50 backdrop-blur-sm p-6 sm:p-8 bg-linear-to-br from-blue-50/50 to-transparent dark:from-blue-950/20 dark:to-transparent">
             <div className="flex items-center mb-4">
               <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mr-3">
                 <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -377,7 +372,7 @@ export default function AddProjectPage() {
           </div>
 
           {/* Action Buttons - Full Width */}
-          <div className="rounded-xl border border-gray-200 bg-white shadow-lg dark:border-gray-800 dark:bg-gray-900/50 backdrop-blur-sm px-6 sm:px-8 py-6 bg-gray-50 dark:bg-gray-800/50 flex flex-col-reverse sm:flex-row justify-end gap-3">
+          <div className="rounded-xl border border-gray-200 shadow-lg dark:border-gray-800 dark:bg-gray-900/50 backdrop-blur-sm px-6 sm:px-8 py-6 bg-gray-50 flex flex-col-reverse sm:flex-row justify-end gap-3">
             <Link
               href="/dashboard"
               className="inline-flex items-center justify-center rounded-lg border-2 border-gray-300 bg-white px-6 py-3 text-sm font-medium text-gray-700 shadow-sm transition-all duration-200 hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:border-gray-500"
@@ -387,7 +382,7 @@ export default function AddProjectPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-3 text-sm font-semibold text-white shadow-lg transition-all duration-200 hover:from-blue-700 hover:to-blue-800 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:from-blue-600 disabled:hover:to-blue-700 dark:from-blue-500 dark:to-blue-600 dark:hover:from-blue-600 dark:hover:to-blue-700"
+              className="inline-flex items-center justify-center rounded-lg bg-linear-to-r from-blue-600 to-blue-700 px-8 py-3 text-sm font-semibold text-white shadow-lg transition-all duration-200 hover:from-blue-700 hover:to-blue-800 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:from-blue-600 disabled:hover:to-blue-700 dark:from-blue-500 dark:to-blue-600 dark:hover:from-blue-600 dark:hover:to-blue-700"
             >
               {isLoading ? (
                 <>
