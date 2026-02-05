@@ -38,3 +38,14 @@ model Project {
 
   @@map("projects")
 }
+
+model errorLog {
+  id         String   @id @default(uuid())
+  projectId  String
+  error      String
+  LLmType    LlmType
+  resolution String?
+  timestamp  DateTime @default(now())
+
+  @@map("error_logs")
+}

@@ -22,3 +22,8 @@ export * from './enums';
  * 
  */
 export type Project = Prisma.ProjectModel
+/**
+ * Model errorLog
+ * 
+ */
+export type errorLog = Prisma.errorLogModel
