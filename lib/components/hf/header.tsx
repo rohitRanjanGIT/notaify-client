@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 // I will just use standard HTML/Tailwind for now to be safe and avoid errors.
 
@@ -45,8 +46,9 @@ export default function Header() {
                     </Link>
                 </nav>
 
-                {/* Auth Buttons */}
-                <div className="flex items-center gap-4">
+                {/* Theme Toggle & Auth Buttons */}
+                <div className="flex items-center gap-3">
+                    <ThemeToggle />
                     <SignedOut>
                         <Link
                             href="/login"

@@ -5,7 +5,69 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@clerk/nextjs';
 import { ProjectConfig } from '@/lib/types/types';
 import Link from 'next/link';
-import ApiKeyDialog from '@/lib/components/dashboard/api-key-dialog';
+import {
+  ArrowLeft,
+  Save,
+  Plus,
+  Loader2,
+  Brain,
+  Mail,
+  KeyRound,
+  RefreshCw,
+  Eye,
+  EyeOff,
+  Copy,
+  Check,
+  AlertCircle,
+  CheckCircle2,
+  ShieldAlert,
+  FileText,
+} from 'lucide-react';
+
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 export default function AddProjectPage() {
   const router = useRouter();
@@ -27,43 +89,33 @@ export default function AddProjectPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [showApiKeyDialog, setShowApiKeyDialog] = useState(false);
   const [showNewApiKeyDialog, setShowNewApiKeyDialog] = useState(false);
-  const [apiKeyDialogData, setApiKeyDialogData] = useState<{ projectId: string; projectName: string } | null>(null);
   const [newlyGeneratedKey, setNewlyGeneratedKey] = useState<{ apiKey: string; apiKeyId: string } | null>(null);
   const [isRegenerating, setIsRegenerating] = useState(false);
   const [visibleApiKey, setVisibleApiKey] = useState(false);
   const [originalFormData, setOriginalFormData] = useState<ProjectConfig | null>(null);
+  const [copiedField, setCopiedField] = useState<string | null>(null);
+  const [showRegenConfirm, setShowRegenConfirm] = useState(false);
 
   useEffect(() => {
     if (!projectId) return;
 
     const loadProjectConfig = async () => {
       try {
-        console.log('Fetching project with ID:', projectId);
-
-        // Fetch the specific project from backend
         const response = await fetch(`/api/project/${projectId}`);
-
-        console.log('Response status:', response.status);
-        console.log('Response OK:', response.ok);
 
         if (!response.ok) {
           let errorData;
           try {
             errorData = await response.json();
-            console.error('API Error Response:', errorData);
-          } catch (e) {
+          } catch {
             const text = await response.text();
-            console.error('API Error (raw text):', text);
             errorData = { error: text || `HTTP ${response.status}` };
           }
           throw new Error(errorData.error || 'Failed to fetch project');
         }
 
         const { project } = await response.json();
-
-        console.log('Project loaded:', project);
 
         if (project) {
           const loadedData = {
@@ -91,69 +143,37 @@ export default function AddProjectPage() {
   }, [projectId]);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
-      // Reset model when LLM type changes
       ...(name === 'llmType' ? { llmApiModel: '' } : {}),
     }));
   };
 
-  const handleApiKeyGenerated = async (apiKey: string, apiKeyId: string) => {
-    // Update the project with the new API key via backend
-    try {
-      if (!apiKeyDialogData) return;
+  const handleLlmTypeChange = (value: string) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      llmType: value as ProjectConfig['llmType'],
+      llmApiModel: '',
+    }));
+  };
 
-      const response = await fetch('/api/project', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          id: apiKeyDialogData.projectId,
-          name: formData.projectName,
-          description: `Project: ${formData.projectName}`,
-          projectName: formData.projectName,
-          llmType: formData.llmType,
-          llmApiKey: formData.llmApiKey,
-          llmApiModel: formData.llmApiModel,
-          smtpUser: formData.smtpUser,
-          smtpPass: formData.smtpPass,
-          emailTo: formData.emailTo,
-          notaifyApiKey: apiKey,
-          notaifyApiKeyId: apiKeyId,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to update API key');
-      }
-
-      // Update form data with new keys
-      setFormData((prev) => ({
-        ...prev,
-        notaifyApiKey: apiKey,
-        notaifyApiKeyId: apiKeyId,
-      }));
-
-      setNewlyGeneratedKey({ apiKey, apiKeyId });
-      setShowNewApiKeyDialog(true);
-      setShowApiKeyDialog(false);
-
-      console.log('API key saved to backend successfully');
-    } catch (err) {
-      console.error('Error updating API key:', err);
-      setError('Failed to save API key');
-    }
+  const handleModelChange = (value: string) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      llmApiModel: value,
+    }));
   };
 
   const handleRegenerateApiKey = async () => {
     if (!formData.project_id) return;
     setIsRegenerating(true);
+    setShowRegenConfirm(false);
 
     try {
-      // Generate new API key
       const generateResponse = await fetch('/api/generateApiKey', {
         method: 'POST',
       });
@@ -164,7 +184,6 @@ export default function AddProjectPage() {
 
       const { apiKey, apiKeyId } = await generateResponse.json();
 
-      // Update project with new API key
       const updateResponse = await fetch('/api/project', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -188,7 +207,6 @@ export default function AddProjectPage() {
         throw new Error('Failed to update project with new API key');
       }
 
-      // Update form data
       setFormData((prev) => ({
         ...prev,
         notaifyApiKey: apiKey,
@@ -205,14 +223,6 @@ export default function AddProjectPage() {
     } finally {
       setIsRegenerating(false);
     }
-  };
-
-  const handleCloseApiKeyDialog = () => {
-    setShowApiKeyDialog(false);
-    setApiKeyDialogData(null);
-    setIsLoading(false);
-    // Redirect to dashboard after closing the dialog
-    setTimeout(() => router.push('/dashboard'), 500);
   };
 
   const getModelOptions = () => {
@@ -264,7 +274,6 @@ export default function AddProjectPage() {
 
     try {
       if (isEditMode && projectId) {
-        // Check if data has changed
         const hasChanges = originalFormData && (
           formData.projectName !== originalFormData.projectName ||
           formData.llmType !== originalFormData.llmType ||
@@ -281,7 +290,6 @@ export default function AddProjectPage() {
           return;
         }
 
-        // Update existing project via API
         const response = await fetch('/api/project', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -310,7 +318,6 @@ export default function AddProjectPage() {
         setIsLoading(false);
         setTimeout(() => router.push('/dashboard'), 1000);
       } else {
-        // Create new project via API - only send necessary fields
         const response = await fetch('/api/project', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -334,7 +341,6 @@ export default function AddProjectPage() {
 
         const { project } = await response.json();
 
-        // Auto-generate API key for new project
         const generateResponse = await fetch('/api/generateApiKey', {
           method: 'POST',
         });
@@ -345,7 +351,6 @@ export default function AddProjectPage() {
 
         const { apiKey, apiKeyId } = await generateResponse.json();
 
-        // Update project with generated API key
         const updateResponse = await fetch('/api/project', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -369,13 +374,12 @@ export default function AddProjectPage() {
           throw new Error('Failed to save API key');
         }
 
-        // Store newly generated key to show in dialog
         setNewlyGeneratedKey({ apiKey, apiKeyId });
         setFormData({
           ...formData,
           project_id: project.id,
           notaifyApiKey: apiKey,
-          notaifyApiKeyId: apiKeyId
+          notaifyApiKeyId: apiKeyId,
         });
         setSuccess('Project created successfully! API key has been auto-generated.');
         setVisibleApiKey(true);
@@ -389,215 +393,218 @@ export default function AddProjectPage() {
     }
   };
 
+  const copyToClipboard = (text: string, field: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedField(field);
+    setTimeout(() => setCopiedField(null), 2000);
+  };
+
   return (
-    <main className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-950 dark:to-black">
-      <div className="container mx-auto px-4 py-8 sm:py-12 sm:px-6 lg:px-8">
-        {/* Header Section */}
-        <div className="mb-8 text-center sm:text-left">
-          <Link
-            href="/dashboard"
-            className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 transition-colors mb-4 group"
-          >
-            <svg className="w-4 h-4 mr-2 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            Back to Dashboard
-          </Link>
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">
-            {isEditMode ? '✏️ Update Project' : '✨ Create New Project'}
-          </h1>
-          <p className="mt-3 text-base text-gray-600 dark:text-gray-400 max-w-2xl">
-            Configure your project settings and integrate with LLMs and email services for seamless automation.
-          </p>
-        </div>
-
-        {/* Alert Messages */}
-        {error && (
-          <div className="mb-6 rounded-lg bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/50 p-4 flex items-start animate-in slide-in-from-top-2 duration-300">
-            <svg className="w-5 h-5 text-red-600 dark:text-red-400 mt-0.5 mr-3 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-            </svg>
-            <span className="text-sm font-medium text-red-800 dark:text-red-400">{error}</span>
-          </div>
-        )}
-        {success && (
-          <div className="mb-6 rounded-lg bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-900/50 p-4 flex items-start animate-in slide-in-from-top-2 duration-300">
-            <svg className="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5 mr-3 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-            </svg>
-            <span className="text-sm font-medium text-green-800 dark:text-green-400">{success}</span>
-          </div>
-        )}
-
-        {/* Form Container */}
-        <form onSubmit={handleSubmit} className="space-y-6">
-
-          {/* Project Name Section - Full Width */}
-          <div className="rounded-xl border border-gray-200 bg-white shadow-lg dark:border-gray-800 dark:bg-gray-900/50 backdrop-blur-sm p-6 sm:p-8 bg-linear-to-br from-blue-50/50 to-transparent dark:from-blue-950/20 dark:to-transparent">
-            <div className="flex items-center mb-4">
-              <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mr-3">
-                <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                </svg>
+    <TooltipProvider>
+      <main className="min-h-screen bg-muted/40 p-4 sm:p-6 lg:p-8">
+        <div className="mx-auto max-w-4xl space-y-6">
+          {/* Header Section */}
+          <div>
+            <Link href="/dashboard">
+              <Button variant="ghost" size="sm" className="mb-4 -ml-2 text-muted-foreground hover:text-foreground">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back to Dashboard
+              </Button>
+            </Link>
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                {isEditMode ? (
+                  <FileText className="h-5 w-5 text-primary" />
+                ) : (
+                  <Plus className="h-5 w-5 text-primary" />
+                )}
               </div>
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Project Details</h2>
+              <div>
+                <h1 className="text-2xl font-bold tracking-tight">
+                  {isEditMode ? 'Update Project' : 'Create New Project'}
+                </h1>
+                <p className="text-sm text-muted-foreground">
+                  Configure your project settings and integrate with LLM and email services.
+                </p>
+              </div>
             </div>
-            <label htmlFor="projectName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Project Name <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              id="projectName"
-              name="projectName"
-              value={formData.projectName}
-              onChange={handleChange}
-              required
-              placeholder="e.g., Production API Monitor"
-              className="block w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 shadow-sm transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500 dark:focus:border-blue-400 dark:focus:ring-blue-400/20"
-            />
           </div>
 
-          {/* Two Column Layout for LLM and Email Configuration */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Alert Messages */}
+          {error && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Error</AlertTitle>
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+          {success && (
+            <Alert className="border-green-200 bg-green-50 text-green-900 dark:border-green-900 dark:bg-green-950/30 dark:text-green-100 [&>svg]:text-green-600 dark:[&>svg]:text-green-400">
+              <CheckCircle2 className="h-4 w-4" />
+              <AlertTitle>Success</AlertTitle>
+              <AlertDescription>{success}</AlertDescription>
+            </Alert>
+          )}
 
-            {/* LLM Configuration Section */}
-            <div className="rounded-xl border border-gray-200 bg-white shadow-lg dark:border-gray-800 dark:bg-gray-900/50 backdrop-blur-sm p-6 sm:p-8">
-              <div className="flex items-center mb-6">
-                <div className="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center mr-3">
-                  <svg className="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                  </svg>
-                </div>
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">LLM Configuration</h2>
-              </div>
-
-              <div className="space-y-5">
-                <div>
-                  <label htmlFor="llmType" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    LLM Provider <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    id="llmType"
-                    name="llmType"
-                    value={formData.llmType}
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Project Name Section */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <FileText className="h-4 w-4 text-blue-500" />
+                  Project Details
+                </CardTitle>
+                <CardDescription>
+                  Give your project a unique, descriptive name.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <Label htmlFor="projectName">
+                    Project Name <span className="text-destructive">*</span>
+                  </Label>
+                  <Input
+                    id="projectName"
+                    name="projectName"
+                    value={formData.projectName}
                     onChange={handleChange}
                     required
-                    className="block w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-900 shadow-sm transition-all duration-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:focus:border-purple-400 dark:focus:ring-purple-400/20"
-                  >
-                    <option value="">Select LLM Provider</option>
-                    <option value="openai">🤖 OpenAI</option>
-                    <option value="claude">🧠 Claude (Anthropic)</option>
-                    <option value="google">🔍 Google (Gemini)</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label htmlFor="llmApiKey" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    API Key <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="password"
-                    id="llmApiKey"
-                    name="llmApiKey"
-                    value={formData.llmApiKey}
-                    onChange={handleChange}
-                    required
-                    placeholder="sk-••••••••••••••••"
-                    className="block w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 shadow-sm transition-all duration-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500 dark:focus:border-purple-400 dark:focus:ring-purple-400/20"
+                    placeholder="e.g., Production API Monitor"
+                    className="max-w-lg"
                   />
                 </div>
+              </CardContent>
+            </Card>
 
-                <div>
-                  <label htmlFor="llmApiModel" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Model Name <span className="text-red-500">*</span>
-                  </label>
-                  {formData.llmType ? (
-                    <select
-                      id="llmApiModel"
-                      name="llmApiModel"
-                      value={formData.llmApiModel}
-                      onChange={handleChange}
+            {/* Two Column Layout */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* LLM Configuration */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-base">
+                    <Brain className="h-4 w-4 text-purple-500" />
+                    LLM Configuration
+                  </CardTitle>
+                  <CardDescription>
+                    Connect your preferred language model provider.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="llmType">
+                      LLM Provider <span className="text-destructive">*</span>
+                    </Label>
+                    <Select
+                      value={formData.llmType || undefined}
+                      onValueChange={handleLlmTypeChange}
                       required
-                      className="block w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-900 shadow-sm transition-all duration-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:focus:border-purple-400 dark:focus:ring-purple-400/20"
                     >
-                      <option value="">Select a model</option>
-                      {getModelOptions().map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
-                  ) : (
-                    <input
-                      type="text"
-                      id="llmApiModel"
-                      name="llmApiModel"
-                      value={formData.llmApiModel}
-                      onChange={handleChange}
-                      required
-                      disabled
-                      placeholder="Please select an LLM provider first"
-                      className="block w-full px-4 py-3 rounded-lg border border-gray-300 bg-gray-100 text-gray-500 placeholder-gray-400 shadow-sm cursor-not-allowed dark:border-gray-600 dark:bg-gray-800 dark:text-gray-500 dark:placeholder-gray-500"
-                    />
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* SMTP Configuration Section */}
-            <div className="rounded-xl border border-gray-200 bg-white shadow-lg dark:border-gray-800 dark:bg-gray-900/50 backdrop-blur-sm p-6 sm:p-8">
-              <div className="flex items-center mb-6">
-                <div className="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center mr-3">
-                  <svg className="w-5 h-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
-                </div>
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Email Configuration</h2>
-              </div>
-
-              <div className="space-y-5">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  <div>
-                    <label htmlFor="smtpUser" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      SMTP Username <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      id="smtpUser"
-                      name="smtpUser"
-                      value={formData.smtpUser}
-                      onChange={handleChange}
-                      required
-                      placeholder="user@example.com"
-                      className="block w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 shadow-sm transition-all duration-200 focus:border-green-500 focus:ring-2 focus:ring-green-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500 dark:focus:border-green-400 dark:focus:ring-green-400/20"
-                    />
+                      <SelectTrigger id="llmType">
+                        <SelectValue placeholder="Select LLM Provider" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="openai">🤖 OpenAI</SelectItem>
+                        <SelectItem value="claude">🧠 Claude (Anthropic)</SelectItem>
+                        <SelectItem value="google">🔍 Google (Gemini)</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
 
-                  <div>
-                    <label htmlFor="smtpPass" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      SMTP Password <span className="text-red-500">*</span>
-                    </label>
-                    <input
+                  <div className="space-y-2">
+                    <Label htmlFor="llmApiKey">
+                      API Key <span className="text-destructive">*</span>
+                    </Label>
+                    <Input
                       type="password"
-                      id="smtpPass"
-                      name="smtpPass"
-                      value={formData.smtpPass}
+                      id="llmApiKey"
+                      name="llmApiKey"
+                      value={formData.llmApiKey}
                       onChange={handleChange}
                       required
-                      placeholder="••••••••"
-                      className="block w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 shadow-sm transition-all duration-200 focus:border-green-500 focus:ring-2 focus:ring-green-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500 dark:focus:border-green-400 dark:focus:ring-green-400/20"
+                      placeholder="sk-••••••••••••••••"
                     />
                   </div>
-                </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  {/* Removed From Email input */}
+                  <div className="space-y-2">
+                    <Label htmlFor="llmApiModel">
+                      Model <span className="text-destructive">*</span>
+                    </Label>
+                    {formData.llmType ? (
+                      <Select
+                        value={formData.llmApiModel || undefined}
+                        onValueChange={handleModelChange}
+                        required
+                      >
+                        <SelectTrigger id="llmApiModel">
+                          <SelectValue placeholder="Select a model" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {getModelOptions().map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <Input
+                        id="llmApiModel"
+                        disabled
+                        placeholder="Select an LLM provider first"
+                        className="cursor-not-allowed"
+                      />
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
 
-                  <div>
-                    <label htmlFor="emailTo" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      To Email <span className="text-red-500">*</span>
-                    </label>
-                    <input
+              {/* SMTP Configuration */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-base">
+                    <Mail className="h-4 w-4 text-green-500" />
+                    Email Configuration
+                  </CardTitle>
+                  <CardDescription>
+                    Set up SMTP credentials for email notifications.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="smtpUser">
+                        SMTP Username <span className="text-destructive">*</span>
+                      </Label>
+                      <Input
+                        id="smtpUser"
+                        name="smtpUser"
+                        value={formData.smtpUser}
+                        onChange={handleChange}
+                        required
+                        placeholder="user@example.com"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="smtpPass">
+                        SMTP Password <span className="text-destructive">*</span>
+                      </Label>
+                      <Input
+                        type="password"
+                        id="smtpPass"
+                        name="smtpPass"
+                        value={formData.smtpPass}
+                        onChange={handleChange}
+                        required
+                        placeholder="••••••••"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="emailTo">
+                      To Email <span className="text-destructive">*</span>
+                    </Label>
+                    <Input
                       type="email"
                       id="emailTo"
                       name="emailTo"
@@ -605,269 +612,300 @@ export default function AddProjectPage() {
                       onChange={handleChange}
                       required
                       placeholder="recipient@example.com"
-                      className="block w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 shadow-sm transition-all duration-200 focus:border-green-500 focus:ring-2 focus:ring-green-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500 dark:focus:border-green-400 dark:focus:ring-green-400/20"
                     />
                   </div>
-                </div>
-              </div>
+                </CardContent>
+              </Card>
             </div>
 
-            {/* API Key Section - Only shown in edit mode or after creation */}
+            {/* API Key Section (Edit Mode) */}
             {isEditMode && formData.notaifyApiKeyId && (
-              <div className="rounded-xl border border-gray-200 bg-white shadow-lg dark:border-gray-800 dark:bg-gray-900/50 backdrop-blur-sm p-6 sm:p-8">
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center">
-                    <div className="w-10 h-10 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center mr-3">
-                      <svg className="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
-                      </svg>
-                    </div>
-                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Notaify API Key</h2>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+                  <div className="space-y-1">
+                    <CardTitle className="flex items-center gap-2 text-base">
+                      <KeyRound className="h-4 w-4 text-amber-500" />
+                      Notaify API Key
+                    </CardTitle>
+                    <CardDescription>
+                      Use this key to authenticate API requests from your application.
+                    </CardDescription>
                   </div>
-                  <button
+                  <Button
                     type="button"
-                    onClick={handleRegenerateApiKey}
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowRegenConfirm(true)}
                     disabled={isRegenerating}
-                    className="inline-flex items-center justify-center gap-2 rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
                     {isRegenerating ? (
-                      <>
-                        <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        Regenerating...
-                      </>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     ) : (
-                      <>
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                        </svg>
-                        Regenerate Key
-                      </>
+                      <RefreshCw className="mr-2 h-4 w-4" />
                     )}
-                  </button>
-                </div>
-
-                <div className="space-y-4">
+                    Regenerate
+                  </Button>
+                </CardHeader>
+                <Separator />
+                <CardContent className="pt-4 space-y-4">
                   {/* API ID */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">API ID</label>
+                  <div className="space-y-2">
+                    <Label className="text-xs text-muted-foreground font-medium">API ID</Label>
                     <div className="flex items-center gap-2">
-                      <code className="flex-1 rounded bg-gray-100 dark:bg-gray-800 px-4 py-3 font-mono text-sm text-gray-900 dark:text-white">
+                      <code className="flex-1 rounded-md border bg-muted/50 px-3 py-2.5 font-mono text-sm">
                         {formData.notaifyApiKeyId}
                       </code>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          navigator.clipboard.writeText(formData.notaifyApiKeyId || '');
-                          setSuccess('API ID copied to clipboard');
-                        }}
-                        className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2"
-                        title="Copy API ID"
-                      >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                        </svg>
-                      </button>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            className="shrink-0"
+                            onClick={() => copyToClipboard(formData.notaifyApiKeyId || '', 'apiId')}
+                          >
+                            {copiedField === 'apiId' ? (
+                              <Check className="h-4 w-4 text-green-500" />
+                            ) : (
+                              <Copy className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>{copiedField === 'apiId' ? 'Copied!' : 'Copy API ID'}</p>
+                        </TooltipContent>
+                      </Tooltip>
                     </div>
                   </div>
-
                   {/* API Key */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">API Key (Secret)</label>
+                  <div className="space-y-2">
+                    <Label className="text-xs text-muted-foreground font-medium">Secret Key</Label>
                     <div className="flex items-center gap-2">
-                      <code className="flex-1 rounded bg-gray-100 dark:bg-gray-800 px-4 py-3 font-mono text-sm text-gray-900 dark:text-white">
-                        {visibleApiKey && formData.notaifyApiKey ? formData.notaifyApiKey : (formData.notaifyApiKey ? '•'.repeat(Math.min(formData.notaifyApiKey.length, 20)) : '-')}
+                      <code className="flex-1 rounded-md border bg-muted/50 px-3 py-2.5 font-mono text-sm break-all">
+                        {visibleApiKey && formData.notaifyApiKey
+                          ? formData.notaifyApiKey
+                          : formData.notaifyApiKey
+                            ? '•'.repeat(Math.min(formData.notaifyApiKey.length, 24))
+                            : '—'}
                       </code>
                       {formData.notaifyApiKey && (
                         <>
-                          <button
-                            type="button"
-                            onClick={() => setVisibleApiKey(!visibleApiKey)}
-                            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2"
-                            title={visibleApiKey ? 'Hide API Key' : 'Show API Key'}
-                          >
-                            {visibleApiKey ? (
-                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-4.803m5.596-3.856a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0z" />
-                              </svg>
-                            ) : (
-                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                              </svg>
-                            )}
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              navigator.clipboard.writeText(formData.notaifyApiKey || '');
-                              setSuccess('API Key copied to clipboard');
-                            }}
-                            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2"
-                            title="Copy API Key"
-                          >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                            </svg>
-                          </button>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="icon"
+                                className="shrink-0"
+                                onClick={() => setVisibleApiKey(!visibleApiKey)}
+                              >
+                                {visibleApiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>{visibleApiKey ? 'Hide' : 'Show'} API Key</p>
+                            </TooltipContent>
+                          </Tooltip>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="icon"
+                                className="shrink-0"
+                                onClick={() => copyToClipboard(formData.notaifyApiKey || '', 'apiKey')}
+                              >
+                                {copiedField === 'apiKey' ? (
+                                  <Check className="h-4 w-4 text-green-500" />
+                                ) : (
+                                  <Copy className="h-4 w-4" />
+                                )}
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>{copiedField === 'apiKey' ? 'Copied!' : 'Copy API Key'}</p>
+                            </TooltipContent>
+                          </Tooltip>
                         </>
                       )}
                     </div>
                   </div>
-                </div>
-              </div>
+                </CardContent>
+              </Card>
             )}
 
-          </div>
-
-          {/* Action Buttons - Full Width */}
-          <div className="rounded-xl border border-gray-200 shadow-lg dark:border-gray-800 dark:bg-gray-900/50 backdrop-blur-sm px-6 sm:px-8 py-6 bg-gray-50 flex flex-col-reverse sm:flex-row justify-end gap-3">
-            <Link
-              href="/dashboard"
-              className="inline-flex items-center justify-center rounded-lg border-2 border-gray-300 bg-white px-6 py-3 text-sm font-medium text-gray-700 shadow-sm transition-all duration-200 hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:border-gray-500"
-            >
-              Cancel
-            </Link>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="inline-flex items-center justify-center rounded-lg bg-linear-to-r from-blue-600 to-blue-700 px-8 py-3 text-sm font-semibold text-white shadow-lg transition-all duration-200 hover:from-blue-700 hover:to-blue-800 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:from-blue-600 disabled:hover:to-blue-700 dark:from-blue-500 dark:to-blue-600 dark:hover:from-blue-600 dark:hover:to-blue-700"
-            >
-              {isLoading ? (
-                <>
-                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Saving...
-                </>
-              ) : (
-                <>
-                  {isEditMode ? (
+            {/* Action Buttons */}
+            <Card className="bg-muted/30">
+              <CardContent className="flex flex-col-reverse sm:flex-row justify-end gap-3 py-4">
+                <Link href="/dashboard">
+                  <Button type="button" variant="outline" className="w-full sm:w-auto">
+                    Cancel
+                  </Button>
+                </Link>
+                <Button type="submit" disabled={isLoading} className="w-full sm:w-auto">
+                  {isLoading ? (
                     <>
-                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Saving…
+                    </>
+                  ) : isEditMode ? (
+                    <>
+                      <Save className="mr-2 h-4 w-4" />
                       Update Project
                     </>
                   ) : (
                     <>
-                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                      </svg>
-                      Create Project & Generate API Key
+                      <Plus className="mr-2 h-4 w-4" />
+                      Create Project &amp; Generate Key
                     </>
                   )}
-                </>
+                </Button>
+              </CardContent>
+            </Card>
+          </form>
+
+          {/* Regenerate Confirmation Dialog */}
+          <AlertDialog open={showRegenConfirm} onOpenChange={setShowRegenConfirm}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle className="flex items-center gap-2">
+                  <ShieldAlert className="h-5 w-5 text-amber-500" />
+                  Regenerate API Key?
+                </AlertDialogTitle>
+                <AlertDialogDescription>
+                  Regenerating the API key will invalidate the previous one. Any integrations using the old key will stop working.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleRegenerateApiKey}>
+                  Regenerate
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+
+          {/* New API Key Success Dialog */}
+          <Dialog open={showNewApiKeyDialog} onOpenChange={setShowNewApiKeyDialog}>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30 mb-2">
+                  <CheckCircle2 className="h-6 w-6 text-green-600 dark:text-green-400" />
+                </div>
+                <DialogTitle className="text-center">API Key Generated</DialogTitle>
+                <DialogDescription className="text-center">
+                  Save this key securely — you won&apos;t be able to see it again.
+                </DialogDescription>
+              </DialogHeader>
+
+              {newlyGeneratedKey && (
+                <div className="space-y-4">
+                  {/* API ID */}
+                  <div className="space-y-1.5">
+                    <Label className="text-xs text-muted-foreground">API ID</Label>
+                    <div className="flex items-center gap-2">
+                      <code className="flex-1 rounded-md border bg-muted/50 px-3 py-2 text-sm font-mono break-all">
+                        {newlyGeneratedKey.apiKeyId}
+                      </code>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            className="shrink-0 h-8 w-8"
+                            onClick={() => copyToClipboard(newlyGeneratedKey.apiKeyId, 'dialogApiId')}
+                          >
+                            {copiedField === 'dialogApiId' ? (
+                              <Check className="h-3.5 w-3.5 text-green-500" />
+                            ) : (
+                              <Copy className="h-3.5 w-3.5" />
+                            )}
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>{copiedField === 'dialogApiId' ? 'Copied!' : 'Copy'}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                  </div>
+
+                  {/* API Key */}
+                  <div className="space-y-1.5">
+                    <Label className="text-xs text-muted-foreground">Secret Key</Label>
+                    <div className="flex items-center gap-2">
+                      <code className="flex-1 rounded-md border bg-muted/50 px-3 py-2 text-sm font-mono break-all">
+                        {visibleApiKey
+                          ? newlyGeneratedKey.apiKey
+                          : '•'.repeat(Math.min(newlyGeneratedKey.apiKey.length, 24))}
+                      </code>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            className="shrink-0 h-8 w-8"
+                            onClick={() => setVisibleApiKey(!visibleApiKey)}
+                          >
+                            {visibleApiKey ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>{visibleApiKey ? 'Hide' : 'Show'}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            className="shrink-0 h-8 w-8"
+                            onClick={() => copyToClipboard(newlyGeneratedKey.apiKey, 'dialogApiKey')}
+                          >
+                            {copiedField === 'dialogApiKey' ? (
+                              <Check className="h-3.5 w-3.5 text-green-500" />
+                            ) : (
+                              <Copy className="h-3.5 w-3.5" />
+                            )}
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>{copiedField === 'dialogApiKey' ? 'Copied!' : 'Copy'}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                  </div>
+
+                  {/* Warning */}
+                  <Alert className="border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-900 dark:bg-amber-950/30 dark:text-amber-100 [&>svg]:text-amber-600 dark:[&>svg]:text-amber-400">
+                    <ShieldAlert className="h-4 w-4" />
+                    <AlertDescription className="text-xs">
+                      Store this key in a secure location. It will not be displayed again after closing this dialog.
+                    </AlertDescription>
+                  </Alert>
+                </div>
               )}
-            </button>
-          </div>
-        </form>
 
-        {/* API Key Dialog */}
-        {apiKeyDialogData && (
-          <ApiKeyDialog
-            projectId={apiKeyDialogData.projectId}
-            projectName={apiKeyDialogData.projectName}
-            isOpen={showApiKeyDialog}
-            onClose={handleCloseApiKeyDialog}
-            onApiKeyGenerated={handleApiKeyGenerated}
-          />
-        )}
-
-        {/* New API Key Success Dialog */}
-        {showNewApiKeyDialog && newlyGeneratedKey && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl max-w-md w-full p-6 animate-in">
-              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 mx-auto mb-4">
-                <svg className="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white text-center mb-2">
-                API Key Generated Successfully
-              </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400 text-center mb-4">
-                Your API key has been created. Save it in a secure location as you won&apos;t be able to see it again.
-              </p>
-
-              <div className="space-y-3 mb-6">
-                {/* API ID */}
-                <div>
-                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">API ID</label>
-                  <div className="flex items-center gap-2">
-                    <code className="flex-1 rounded bg-gray-100 dark:bg-gray-800 px-3 py-2 text-sm font-mono text-gray-900 dark:text-white break-all">
-                      {newlyGeneratedKey.apiKeyId}
-                    </code>
-                    <button
-                      onClick={() => {
-                        navigator.clipboard.writeText(newlyGeneratedKey.apiKeyId);
-                        setSuccess('API ID copied to clipboard');
-                      }}
-                      className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-
-                {/* API Key */}
-                <div>
-                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">API Key (Secret)</label>
-                  <div className="flex items-center gap-2">
-                    <code className="flex-1 rounded bg-gray-100 dark:bg-gray-800 px-3 py-2 text-sm font-mono text-gray-900 dark:text-white break-all">
-                      {visibleApiKey ? newlyGeneratedKey.apiKey : '•'.repeat(Math.min(newlyGeneratedKey.apiKey.length, 20))}
-                    </code>
-                    <button
-                      onClick={() => setVisibleApiKey(!visibleApiKey)}
-                      className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                    >
-                      {visibleApiKey ? (
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-4.803m5.596-3.856a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0z" />
-                        </svg>
-                      ) : (
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                        </svg>
-                      )}
-                    </button>
-                    <button
-                      onClick={() => {
-                        navigator.clipboard.writeText(newlyGeneratedKey.apiKey);
-                        setSuccess('API Key copied to clipboard');
-                      }}
-                      className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <button
-                onClick={() => {
-                  setShowNewApiKeyDialog(false);
-                  setNewlyGeneratedKey(null);
-                  if (!isEditMode) {
-                    setTimeout(() => router.push('/dashboard'), 500);
-                  }
-                }}
-                className="w-full rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 transition-colors"
-              >
-                {isEditMode ? 'Done' : 'Go to Dashboard'}
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
-    </main>
+              <DialogFooter className="sm:justify-center">
+                <Button
+                  onClick={() => {
+                    setShowNewApiKeyDialog(false);
+                    setNewlyGeneratedKey(null);
+                    if (!isEditMode) {
+                      setTimeout(() => router.push('/dashboard'), 300);
+                    }
+                  }}
+                  className="w-full sm:w-auto"
+                >
+                  {isEditMode ? 'Done' : 'Go to Dashboard'}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
+      </main>
+    </TooltipProvider>
   );
 }
