@@ -27,7 +27,6 @@ model Project {
 
   smtpUser  String?
   smtpPass  String?
-  emailFrom String?
   emailTo   String?
 
   notaifyApiKey   String?

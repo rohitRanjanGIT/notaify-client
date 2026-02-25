@@ -603,7 +603,6 @@ export const ProjectScalarFieldEnum = {
   llmApiModel: 'llmApiModel',
   smtpUser: 'smtpUser',
   smtpPass: 'smtpPass',
-  emailFrom: 'emailFrom',
   emailTo: 'emailTo',
   notaifyApiKey: 'notaifyApiKey',
   notaifyApiKeyId: 'notaifyApiKeyId',

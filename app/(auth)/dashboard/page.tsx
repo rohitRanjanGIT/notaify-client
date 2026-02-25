@@ -4,7 +4,20 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@clerk/nextjs';
 import { ProjectConfig } from '@/lib/types/types';
 import Link from 'next/link';
-import { Plus, Trash2, Edit2, Copy, Eye, EyeOff } from 'lucide-react';
+import { Plus, Trash2, Edit2, Copy, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function DashboardPage() {
   const { userId } = useAuth();
@@ -20,13 +33,13 @@ export default function DashboardPage() {
 
       try {
         const response = await fetch(`/api/project?userId=${userId}`);
-        
+
         if (!response.ok) {
           throw new Error('Failed to fetch projects');
         }
-        
+
         const { projects: fetchedProjects } = await response.json();
-        
+
         // Transform backend data to match ProjectConfig
         const transformedProjects: ProjectConfig[] = fetchedProjects.map((p: any) => ({
           project_id: p.id,
@@ -37,14 +50,13 @@ export default function DashboardPage() {
           llmApiModel: p.llmApiModel || '',
           smtpUser: p.smtpUser || '',
           smtpPass: p.smtpPass || '',
-          emailFrom: p.emailFrom || '',
           emailTo: p.emailTo || '',
           notaifyApiKey: p.notaifyApiKey || '',
           notaifyApiKeyId: p.notaifyApiKeyId || '',
           createdAt: p.createdAt ? new Date(p.createdAt) : undefined,
           updatedAt: p.updatedAt ? new Date(p.updatedAt) : undefined,
         }));
-        
+
         setProjects(transformedProjects);
       } catch (err) {
         console.error('Error loading projects:', err);
@@ -59,7 +71,7 @@ export default function DashboardPage() {
 
   const handleDeleteProject = async (id: string) => {
     if (!confirm('Are you sure you want to delete this project?')) return;
-    
+
     try {
       const response = await fetch(`/api/project?id=${id}`, {
         method: 'DELETE',
@@ -108,177 +120,178 @@ export default function DashboardPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gray-50 dark:bg-black">
-      <div className="container mx-auto px-4 py-12 sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-muted/40 p-6">
+      <div className="mx-auto max-w-7xl space-y-8">
         {/* Header */}
-        <div className="mb-8 flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-4xl font-bold text-gray-900 dark:text-white">
-              Dashboard
-            </h1>
-            <p className="mt-2 text-gray-600 dark:text-gray-400">
+            <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+            <p className="text-muted-foreground mt-1 text-sm">
               Manage all your projects
             </p>
           </div>
-          <Link
-            href="/dashboard/addProject"
-            className="inline-flex items-center justify-center gap-2 rounded-md bg-black px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-950 focus:ring-offset-2 dark:bg-white dark:text-black dark:hover:bg-gray-200"
-          >
-            <Plus className="h-4 w-4" />
-            New Project
+          <Link href="/dashboard/addProject">
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              New Project
+            </Button>
           </Link>
         </div>
 
         {/* Error Message */}
         {error && (
-          <div className="mb-6 rounded-md bg-red-50 p-4 text-sm text-red-800 dark:bg-red-900/20 dark:text-red-400">
-            {error}
-          </div>
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
         )}
 
         {/* Loading State */}
         {isLoading ? (
-          <div className="flex items-center justify-center py-12">
-            <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-black dark:border-gray-600 dark:border-t-white"></div>
-          </div>
+          <Card>
+            <CardHeader>
+              <CardTitle><Skeleton className="h-6 w-[150px]" /></CardTitle>
+              <CardDescription><Skeleton className="h-4 w-[250px]" /></CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+            </CardContent>
+          </Card>
         ) : projects.length === 0 ? (
-          <div className="rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 p-12 text-center dark:border-gray-700 dark:bg-gray-900/50">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-              No projects yet
-            </h3>
-            <p className="mt-2 text-gray-600 dark:text-gray-400">
-              Get started by creating your first project
-            </p>
-          </div>
+          <Card className="flex flex-col items-center justify-center p-12 text-center border-dashed">
+            <CardHeader className="items-center pb-2">
+              <CardTitle>No projects yet</CardTitle>
+              <CardDescription>Get started by creating your first project.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Link href="/dashboard/addProject">
+                <Button variant="outline" className="mt-4">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Create Project
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
         ) : (
-          <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-800">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-200 bg-gray-100 dark:border-gray-800 dark:bg-gray-900/50">
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">
-                    Project Name
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">
-                    Description
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">
-                    LLM Type
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">
-                    API ID
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">
-                    API Key
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">
-                    Created At
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">
-                    Updated At
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900 dark:text-white">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
-                {projects.map((project) => (
-                  <tr
-                    key={project.project_id}
-                    className="transition-colors hover:bg-gray-50 dark:hover:bg-gray-900/30"
-                  >
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
-                      {project.projectName}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
-                      <span title={project.description || '-'}>
-                        {project.description ? (project.description.length > 30 ? project.description.substring(0, 30) + '...' : project.description) : '-'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
-                      <span className="inline-block rounded bg-gray-200 px-2 py-1 text-xs font-medium uppercase dark:bg-gray-800">
-                        {project.llmType || '-'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
-                      <div className="flex items-center gap-2">
-                        <code className="rounded bg-gray-100 px-2 py-1 font-mono text-xs dark:bg-gray-900">
-                          {project.notaifyApiKeyId || '-'}
-                        </code>
-                        {project.notaifyApiKeyId && (
-                          <button
-                            onClick={() => copyToClipboard(project.notaifyApiKeyId || '')}
-                            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                            title="Copy API ID"
+          <Card className="overflow-hidden">
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Project Name</TableHead>
+                    <TableHead>Description</TableHead>
+                    <TableHead>LLM Type</TableHead>
+                    <TableHead>API ID</TableHead>
+                    <TableHead>API Key</TableHead>
+                    <TableHead>Created</TableHead>
+                    <TableHead>Updated</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {projects.map((project) => (
+                    <TableRow key={project.project_id}>
+                      <TableCell className="font-medium">{project.projectName}</TableCell>
+                      <TableCell className="max-w-[200px] truncate" title={project.description || '-'}>
+                        {project.description || '-'}
+                      </TableCell>
+                      <TableCell>
+                        {project.llmType ? (
+                          <Badge variant="secondary" className="uppercase">{project.llmType}</Badge>
+                        ) : (
+                          '-'
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold text-muted-foreground">
+                            {project.notaifyApiKeyId || '-'}
+                          </code>
+                          {project.notaifyApiKeyId && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6 text-muted-foreground hover:text-foreground"
+                              onClick={() => copyToClipboard(project.notaifyApiKeyId || '')}
+                              title="Copy API ID"
+                            >
+                              <Copy className="h-3 w-3" />
+                              <span className="sr-only">Copy API ID</span>
+                            </Button>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold text-muted-foreground">
+                            {visibleKeys.has(project.project_id)
+                              ? project.notaifyApiKey || '-'
+                              : maskApiKey(project.notaifyApiKey || '')}
+                          </code>
+                          {project.notaifyApiKey && (
+                            <div className="flex items-center gap-1">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6 text-muted-foreground hover:text-foreground"
+                                onClick={() => toggleKeyVisibility(project.project_id)}
+                                title={visibleKeys.has(project.project_id) ? 'Hide API Key' : 'Show API Key'}
+                              >
+                                {visibleKeys.has(project.project_id) ? (
+                                  <EyeOff className="h-3 w-3" />
+                                ) : (
+                                  <Eye className="h-3 w-3" />
+                                )}
+                                <span className="sr-only">Toggle API Key visibility</span>
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6 text-muted-foreground hover:text-foreground"
+                                onClick={() => copyToClipboard(project.notaifyApiKey || '')}
+                                title="Copy API Key"
+                              >
+                                <Copy className="h-3 w-3" />
+                                <span className="sr-only">Copy API Key</span>
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-muted-foreground whitespace-nowrap">{formatDate(project.createdAt)}</TableCell>
+                      <TableCell className="text-muted-foreground whitespace-nowrap">{formatDate(project.updatedAt)}</TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end gap-1">
+                          <Link href={`/dashboard/addProject?id=${project.project_id}`}>
+                            <Button variant="ghost" size="icon" title="Edit Project" className="h-8 w-8 text-muted-foreground hover:text-foreground">
+                              <Edit2 className="h-4 w-4" />
+                              <span className="sr-only">Edit Project</span>
+                            </Button>
+                          </Link>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            title="Delete Project"
+                            className="h-8 w-8 text-destructive focus:text-destructive hover:bg-destructive/10 hover:text-destructive"
+                            onClick={() => handleDeleteProject(project.project_id)}
                           >
-                            <Copy className="h-4 w-4" />
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
-                      <div className="flex items-center gap-2">
-                        <code className="rounded bg-gray-100 px-2 py-1 font-mono text-xs dark:bg-gray-900">
-                          {visibleKeys.has(project.project_id)
-                            ? project.notaifyApiKey || '-'
-                            : maskApiKey(project.notaifyApiKey || '')}
-                        </code>
-                        {project.notaifyApiKey && (
-                          <>
-                            <button
-                              onClick={() => toggleKeyVisibility(project.project_id)}
-                              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                              title={visibleKeys.has(project.project_id) ? 'Hide API Key' : 'Show API Key'}
-                            >
-                              {visibleKeys.has(project.project_id) ? (
-                                <EyeOff className="h-4 w-4" />
-                              ) : (
-                                <Eye className="h-4 w-4" />
-                              )}
-                            </button>
-                            <button
-                              onClick={() => copyToClipboard(project.notaifyApiKey || '')}
-                              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                              title="Copy API Key"
-                            >
-                              <Copy className="h-4 w-4" />
-                            </button>
-                          </>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
-                      {formatDate(project.createdAt)}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
-                      {formatDate(project.updatedAt)}
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2">
-                        <Link
-                          href={`/dashboard/addProject?id=${project.project_id}`}
-                          className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                          title="Edit Project"
-                        >
-                          <Edit2 className="h-4 w-4" />
-                        </Link>
-                        <button
-                          onClick={() => handleDeleteProject(project.project_id)}
-                          className="text-gray-400 hover:text-red-600 dark:hover:text-red-400"
-                          title="Delete Project"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                            <Trash2 className="h-4 w-4" />
+                            <span className="sr-only">Delete Project</span>
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </Card>
         )}
       </div>
     </main>
   );
 }
- 

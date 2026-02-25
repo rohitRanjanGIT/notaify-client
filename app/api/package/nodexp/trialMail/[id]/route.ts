@@ -1,28 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma/prisma';
 
-const errorlog = prisma.errorLog;
 const projects = prisma.project;
+const users = prisma.errorLog;
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+
+export async function POST(request: NextRequest) {
   try {
-    const project_id = params.id;
-    
-    const project = projects.findFirst({
-        where: {id: project_id}
-    });
-
-    
-    
+    const { project_id } = await request.json();
+    return NextResponse.json({ message: "success", data: ["id: ", project_id] });
   } catch (error) {
-    console.error(error);
-
-    return NextResponse.json(
-      { error: 'Something went wrong at api/package/nodexp/trialMail/[id]' },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: "error" });
   }
 }

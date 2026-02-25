@@ -35,7 +35,6 @@ export type ProjectMinAggregateOutputType = {
   llmApiModel: string | null
   smtpUser: string | null
   smtpPass: string | null
-  emailFrom: string | null
   emailTo: string | null
   notaifyApiKey: string | null
   notaifyApiKeyId: string | null
@@ -54,7 +53,6 @@ export type ProjectMaxAggregateOutputType = {
   llmApiModel: string | null
   smtpUser: string | null
   smtpPass: string | null
-  emailFrom: string | null
   emailTo: string | null
   notaifyApiKey: string | null
   notaifyApiKeyId: string | null
@@ -73,7 +71,6 @@ export type ProjectCountAggregateOutputType = {
   llmApiModel: number
   smtpUser: number
   smtpPass: number
-  emailFrom: number
   emailTo: number
   notaifyApiKey: number
   notaifyApiKeyId: number
@@ -94,7 +91,6 @@ export type ProjectMinAggregateInputType = {
   llmApiModel?: true
   smtpUser?: true
   smtpPass?: true
-  emailFrom?: true
   emailTo?: true
   notaifyApiKey?: true
   notaifyApiKeyId?: true
@@ -113,7 +109,6 @@ export type ProjectMaxAggregateInputType = {
   llmApiModel?: true
   smtpUser?: true
   smtpPass?: true
-  emailFrom?: true
   emailTo?: true
   notaifyApiKey?: true
   notaifyApiKeyId?: true
@@ -132,7 +127,6 @@ export type ProjectCountAggregateInputType = {
   llmApiModel?: true
   smtpUser?: true
   smtpPass?: true
-  emailFrom?: true
   emailTo?: true
   notaifyApiKey?: true
   notaifyApiKeyId?: true
@@ -224,7 +218,6 @@ export type ProjectGroupByOutputType = {
   llmApiModel: string | null
   smtpUser: string | null
   smtpPass: string | null
-  emailFrom: string | null
   emailTo: string | null
   notaifyApiKey: string | null
   notaifyApiKeyId: string | null
@@ -264,7 +257,6 @@ export type ProjectWhereInput = {
   llmApiModel?: Prisma.StringNullableFilter<"Project"> | string | null
   smtpUser?: Prisma.StringNullableFilter<"Project"> | string | null
   smtpPass?: Prisma.StringNullableFilter<"Project"> | string | null
-  emailFrom?: Prisma.StringNullableFilter<"Project"> | string | null
   emailTo?: Prisma.StringNullableFilter<"Project"> | string | null
   notaifyApiKey?: Prisma.StringNullableFilter<"Project"> | string | null
   notaifyApiKeyId?: Prisma.StringNullableFilter<"Project"> | string | null
@@ -283,7 +275,6 @@ export type ProjectOrderByWithRelationInput = {
   llmApiModel?: Prisma.SortOrderInput | Prisma.SortOrder
   smtpUser?: Prisma.SortOrderInput | Prisma.SortOrder
   smtpPass?: Prisma.SortOrderInput | Prisma.SortOrder
-  emailFrom?: Prisma.SortOrderInput | Prisma.SortOrder
   emailTo?: Prisma.SortOrderInput | Prisma.SortOrder
   notaifyApiKey?: Prisma.SortOrderInput | Prisma.SortOrder
   notaifyApiKeyId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -305,7 +296,6 @@ export type ProjectWhereUniqueInput = Prisma.AtLeast<{
   llmApiModel?: Prisma.StringNullableFilter<"Project"> | string | null
   smtpUser?: Prisma.StringNullableFilter<"Project"> | string | null
   smtpPass?: Prisma.StringNullableFilter<"Project"> | string | null
-  emailFrom?: Prisma.StringNullableFilter<"Project"> | string | null
   emailTo?: Prisma.StringNullableFilter<"Project"> | string | null
   notaifyApiKey?: Prisma.StringNullableFilter<"Project"> | string | null
   notaifyApiKeyId?: Prisma.StringNullableFilter<"Project"> | string | null
@@ -324,7 +314,6 @@ export type ProjectOrderByWithAggregationInput = {
   llmApiModel?: Prisma.SortOrderInput | Prisma.SortOrder
   smtpUser?: Prisma.SortOrderInput | Prisma.SortOrder
   smtpPass?: Prisma.SortOrderInput | Prisma.SortOrder
-  emailFrom?: Prisma.SortOrderInput | Prisma.SortOrder
   emailTo?: Prisma.SortOrderInput | Prisma.SortOrder
   notaifyApiKey?: Prisma.SortOrderInput | Prisma.SortOrder
   notaifyApiKeyId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -349,7 +338,6 @@ export type ProjectScalarWhereWithAggregatesInput = {
   llmApiModel?: Prisma.StringNullableWithAggregatesFilter<"Project"> | string | null
   smtpUser?: Prisma.StringNullableWithAggregatesFilter<"Project"> | string | null
   smtpPass?: Prisma.StringNullableWithAggregatesFilter<"Project"> | string | null
-  emailFrom?: Prisma.StringNullableWithAggregatesFilter<"Project"> | string | null
   emailTo?: Prisma.StringNullableWithAggregatesFilter<"Project"> | string | null
   notaifyApiKey?: Prisma.StringNullableWithAggregatesFilter<"Project"> | string | null
   notaifyApiKeyId?: Prisma.StringNullableWithAggregatesFilter<"Project"> | string | null
@@ -368,7 +356,6 @@ export type ProjectCreateInput = {
   llmApiModel?: string | null
   smtpUser?: string | null
   smtpPass?: string | null
-  emailFrom?: string | null
   emailTo?: string | null
   notaifyApiKey?: string | null
   notaifyApiKeyId?: string | null
@@ -387,7 +374,6 @@ export type ProjectUncheckedCreateInput = {
   llmApiModel?: string | null
   smtpUser?: string | null
   smtpPass?: string | null
-  emailFrom?: string | null
   emailTo?: string | null
   notaifyApiKey?: string | null
   notaifyApiKeyId?: string | null
@@ -406,7 +392,6 @@ export type ProjectUpdateInput = {
   llmApiModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   smtpUser?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   smtpPass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  emailFrom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notaifyApiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notaifyApiKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -425,7 +410,6 @@ export type ProjectUncheckedUpdateInput = {
   llmApiModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   smtpUser?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   smtpPass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  emailFrom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notaifyApiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notaifyApiKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -444,7 +428,6 @@ export type ProjectCreateManyInput = {
   llmApiModel?: string | null
   smtpUser?: string | null
   smtpPass?: string | null
-  emailFrom?: string | null
   emailTo?: string | null
   notaifyApiKey?: string | null
   notaifyApiKeyId?: string | null
@@ -463,7 +446,6 @@ export type ProjectUpdateManyMutationInput = {
   llmApiModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   smtpUser?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   smtpPass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  emailFrom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notaifyApiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notaifyApiKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -482,7 +464,6 @@ export type ProjectUncheckedUpdateManyInput = {
   llmApiModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   smtpUser?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   smtpPass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  emailFrom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notaifyApiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notaifyApiKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -501,7 +482,6 @@ export type ProjectCountOrderByAggregateInput = {
   llmApiModel?: Prisma.SortOrder
   smtpUser?: Prisma.SortOrder
   smtpPass?: Prisma.SortOrder
-  emailFrom?: Prisma.SortOrder
   emailTo?: Prisma.SortOrder
   notaifyApiKey?: Prisma.SortOrder
   notaifyApiKeyId?: Prisma.SortOrder
@@ -520,7 +500,6 @@ export type ProjectMaxOrderByAggregateInput = {
   llmApiModel?: Prisma.SortOrder
   smtpUser?: Prisma.SortOrder
   smtpPass?: Prisma.SortOrder
-  emailFrom?: Prisma.SortOrder
   emailTo?: Prisma.SortOrder
   notaifyApiKey?: Prisma.SortOrder
   notaifyApiKeyId?: Prisma.SortOrder
@@ -539,7 +518,6 @@ export type ProjectMinOrderByAggregateInput = {
   llmApiModel?: Prisma.SortOrder
   smtpUser?: Prisma.SortOrder
   smtpPass?: Prisma.SortOrder
-  emailFrom?: Prisma.SortOrder
   emailTo?: Prisma.SortOrder
   notaifyApiKey?: Prisma.SortOrder
   notaifyApiKeyId?: Prisma.SortOrder
@@ -576,7 +554,6 @@ export type ProjectSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   llmApiModel?: boolean
   smtpUser?: boolean
   smtpPass?: boolean
-  emailFrom?: boolean
   emailTo?: boolean
   notaifyApiKey?: boolean
   notaifyApiKeyId?: boolean
@@ -595,7 +572,6 @@ export type ProjectSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   llmApiModel?: boolean
   smtpUser?: boolean
   smtpPass?: boolean
-  emailFrom?: boolean
   emailTo?: boolean
   notaifyApiKey?: boolean
   notaifyApiKeyId?: boolean
@@ -614,7 +590,6 @@ export type ProjectSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   llmApiModel?: boolean
   smtpUser?: boolean
   smtpPass?: boolean
-  emailFrom?: boolean
   emailTo?: boolean
   notaifyApiKey?: boolean
   notaifyApiKeyId?: boolean
@@ -633,7 +608,6 @@ export type ProjectSelectScalar = {
   llmApiModel?: boolean
   smtpUser?: boolean
   smtpPass?: boolean
-  emailFrom?: boolean
   emailTo?: boolean
   notaifyApiKey?: boolean
   notaifyApiKeyId?: boolean
@@ -641,7 +615,7 @@ export type ProjectSelectScalar = {
   updatedAt?: boolean
 }
 
-export type ProjectOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "user_id" | "name" | "description" | "projectName" | "llmType" | "llmApiKey" | "llmApiModel" | "smtpUser" | "smtpPass" | "emailFrom" | "emailTo" | "notaifyApiKey" | "notaifyApiKeyId" | "createdAt" | "updatedAt", ExtArgs["result"]["project"]>
+export type ProjectOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "user_id" | "name" | "description" | "projectName" | "llmType" | "llmApiKey" | "llmApiModel" | "smtpUser" | "smtpPass" | "emailTo" | "notaifyApiKey" | "notaifyApiKeyId" | "createdAt" | "updatedAt", ExtArgs["result"]["project"]>
 
 export type $ProjectPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Project"
@@ -657,7 +631,6 @@ export type $ProjectPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     llmApiModel: string | null
     smtpUser: string | null
     smtpPass: string | null
-    emailFrom: string | null
     emailTo: string | null
     notaifyApiKey: string | null
     notaifyApiKeyId: string | null
@@ -1096,7 +1069,6 @@ export interface ProjectFieldRefs {
   readonly llmApiModel: Prisma.FieldRef<"Project", 'String'>
   readonly smtpUser: Prisma.FieldRef<"Project", 'String'>
   readonly smtpPass: Prisma.FieldRef<"Project", 'String'>
-  readonly emailFrom: Prisma.FieldRef<"Project", 'String'>
   readonly emailTo: Prisma.FieldRef<"Project", 'String'>
   readonly notaifyApiKey: Prisma.FieldRef<"Project", 'String'>
   readonly notaifyApiKeyId: Prisma.FieldRef<"Project", 'String'>

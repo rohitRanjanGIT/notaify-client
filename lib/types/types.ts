@@ -18,7 +18,6 @@ export interface ProjectConfig {
 
   smtpUser?: string;
   smtpPass?: string;
-  emailFrom?: string;
   emailTo?: string;
 
   notaifyApiKey?: string;

@@ -176,8 +176,6 @@ async function sendErrorAnalysisEmail(
     }
 }
 
-
-
 interface SampleErrorMailParams {
     smtpUsername: string;
     smtpPassword: string;

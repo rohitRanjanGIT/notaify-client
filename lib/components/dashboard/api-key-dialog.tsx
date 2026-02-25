@@ -29,7 +29,7 @@ export default function ApiKeyDialog({
     setIsLoading(true);
     try {
       console.log('Generating API key for:', { projectId, projectName });
-      
+
       const response = await fetch('/api/generateApiKey', {
         method: 'POST',
         headers: {
@@ -42,7 +42,7 @@ export default function ApiKeyDialog({
       });
 
       console.log('API Response status:', response.status);
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         console.error('API Error response:', errorData);

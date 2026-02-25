@@ -20,7 +20,6 @@ export default function AddProjectPage() {
     llmApiModel: '',
     smtpUser: '',
     smtpPass: '',
-    emailFrom: '',
     emailTo: '',
     projectName: '',
     notaifyApiKey: '',
@@ -42,13 +41,13 @@ export default function AddProjectPage() {
     const loadProjectConfig = async () => {
       try {
         console.log('Fetching project with ID:', projectId);
-        
+
         // Fetch the specific project from backend
         const response = await fetch(`/api/project/${projectId}`);
-        
+
         console.log('Response status:', response.status);
         console.log('Response OK:', response.ok);
-        
+
         if (!response.ok) {
           let errorData;
           try {
@@ -61,11 +60,11 @@ export default function AddProjectPage() {
           }
           throw new Error(errorData.error || 'Failed to fetch project');
         }
-        
+
         const { project } = await response.json();
-        
+
         console.log('Project loaded:', project);
-        
+
         if (project) {
           const loadedData = {
             project_id: project.id,
@@ -75,7 +74,6 @@ export default function AddProjectPage() {
             llmApiModel: project.llmApiModel || '',
             smtpUser: project.smtpUser || '',
             smtpPass: project.smtpPass || '',
-            emailFrom: project.emailFrom || '',
             emailTo: project.emailTo || '',
             notaifyApiKey: project.notaifyApiKey || '',
             notaifyApiKeyId: project.notaifyApiKeyId || '',
@@ -122,7 +120,6 @@ export default function AddProjectPage() {
           llmApiModel: formData.llmApiModel,
           smtpUser: formData.smtpUser,
           smtpPass: formData.smtpPass,
-          emailFrom: formData.emailFrom,
           emailTo: formData.emailTo,
           notaifyApiKey: apiKey,
           notaifyApiKeyId: apiKeyId,
@@ -181,7 +178,6 @@ export default function AddProjectPage() {
           llmApiModel: formData.llmApiModel,
           smtpUser: formData.smtpUser,
           smtpPass: formData.smtpPass,
-          emailFrom: formData.emailFrom,
           emailTo: formData.emailTo,
           notaifyApiKey: apiKey,
           notaifyApiKeyId: apiKeyId,
@@ -276,7 +272,6 @@ export default function AddProjectPage() {
           formData.llmApiModel !== originalFormData.llmApiModel ||
           formData.smtpUser !== originalFormData.smtpUser ||
           formData.smtpPass !== originalFormData.smtpPass ||
-          formData.emailFrom !== originalFormData.emailFrom ||
           formData.emailTo !== originalFormData.emailTo
         );
 
@@ -300,7 +295,6 @@ export default function AddProjectPage() {
             llmApiModel: formData.llmApiModel,
             smtpUser: formData.smtpUser,
             smtpPass: formData.smtpPass,
-            emailFrom: formData.emailFrom,
             emailTo: formData.emailTo,
             notaifyApiKey: formData.notaifyApiKey,
             notaifyApiKeyId: formData.notaifyApiKeyId,
@@ -330,7 +324,6 @@ export default function AddProjectPage() {
             llmApiModel: formData.llmApiModel || null,
             smtpUser: formData.smtpUser || null,
             smtpPass: formData.smtpPass || null,
-            emailFrom: formData.emailFrom || null,
             emailTo: formData.emailTo || null,
           }),
         });
@@ -366,7 +359,6 @@ export default function AddProjectPage() {
             llmApiModel: formData.llmApiModel || null,
             smtpUser: formData.smtpUser || null,
             smtpPass: formData.smtpPass || null,
-            emailFrom: formData.emailFrom || null,
             emailTo: formData.emailTo || null,
             notaifyApiKey: apiKey,
             notaifyApiKeyId: apiKeyId,
@@ -379,11 +371,11 @@ export default function AddProjectPage() {
 
         // Store newly generated key to show in dialog
         setNewlyGeneratedKey({ apiKey, apiKeyId });
-        setFormData({ 
-          ...formData, 
-          project_id: project.id, 
-          notaifyApiKey: apiKey, 
-          notaifyApiKeyId: apiKeyId 
+        setFormData({
+          ...formData,
+          project_id: project.id,
+          notaifyApiKey: apiKey,
+          notaifyApiKeyId: apiKeyId
         });
         setSuccess('Project created successfully! API key has been auto-generated.');
         setVisibleApiKey(true);
@@ -402,8 +394,8 @@ export default function AddProjectPage() {
       <div className="container mx-auto px-4 py-8 sm:py-12 sm:px-6 lg:px-8">
         {/* Header Section */}
         <div className="mb-8 text-center sm:text-left">
-          <Link 
-            href="/dashboard" 
+          <Link
+            href="/dashboard"
             className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 transition-colors mb-4 group"
           >
             <svg className="w-4 h-4 mr-2 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -439,7 +431,7 @@ export default function AddProjectPage() {
 
         {/* Form Container */}
         <form onSubmit={handleSubmit} className="space-y-6">
-          
+
           {/* Project Name Section - Full Width */}
           <div className="rounded-xl border border-gray-200 bg-white shadow-lg dark:border-gray-800 dark:bg-gray-900/50 backdrop-blur-sm p-6 sm:p-8 bg-linear-to-br from-blue-50/50 to-transparent dark:from-blue-950/20 dark:to-transparent">
             <div className="flex items-center mb-4">
@@ -467,281 +459,267 @@ export default function AddProjectPage() {
 
           {/* Two Column Layout for LLM and Email Configuration */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            
+
             {/* LLM Configuration Section */}
             <div className="rounded-xl border border-gray-200 bg-white shadow-lg dark:border-gray-800 dark:bg-gray-900/50 backdrop-blur-sm p-6 sm:p-8">
-            <div className="flex items-center mb-6">
-              <div className="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center mr-3">
-                <svg className="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                </svg>
+              <div className="flex items-center mb-6">
+                <div className="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center mr-3">
+                  <svg className="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                  </svg>
+                </div>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">LLM Configuration</h2>
               </div>
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">LLM Configuration</h2>
-            </div>
-            
-            <div className="space-y-5">
-              <div>
-                <label htmlFor="llmType" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  LLM Provider <span className="text-red-500">*</span>
-                </label>
-                <select
-                  id="llmType"
-                  name="llmType"
-                  value={formData.llmType}
-                  onChange={handleChange}
-                  required
-                  className="block w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-900 shadow-sm transition-all duration-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:focus:border-purple-400 dark:focus:ring-purple-400/20"
-                >
-                  <option value="">Select LLM Provider</option>
-                  <option value="openai">🤖 OpenAI</option>
-                  <option value="claude">🧠 Claude (Anthropic)</option>
-                  <option value="google">🔍 Google (Gemini)</option>
-                </select>
-              </div>
-              
-              <div>
-                <label htmlFor="llmApiKey" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  API Key <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="password"
-                  id="llmApiKey"
-                  name="llmApiKey"
-                  value={formData.llmApiKey}
-                  onChange={handleChange}
-                  required
-                  placeholder="sk-••••••••••••••••"
-                  className="block w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 shadow-sm transition-all duration-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500 dark:focus:border-purple-400 dark:focus:ring-purple-400/20"
-                />
-              </div>
-              
-              <div>
-                <label htmlFor="llmApiModel" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Model Name <span className="text-red-500">*</span>
-                </label>
-                {formData.llmType ? (
+
+              <div className="space-y-5">
+                <div>
+                  <label htmlFor="llmType" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    LLM Provider <span className="text-red-500">*</span>
+                  </label>
                   <select
-                    id="llmApiModel"
-                    name="llmApiModel"
-                    value={formData.llmApiModel}
+                    id="llmType"
+                    name="llmType"
+                    value={formData.llmType}
                     onChange={handleChange}
                     required
                     className="block w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-900 shadow-sm transition-all duration-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:focus:border-purple-400 dark:focus:ring-purple-400/20"
                   >
-                    <option value="">Select a model</option>
-                    {getModelOptions().map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
+                    <option value="">Select LLM Provider</option>
+                    <option value="openai">🤖 OpenAI</option>
+                    <option value="claude">🧠 Claude (Anthropic)</option>
+                    <option value="google">🔍 Google (Gemini)</option>
                   </select>
-                ) : (
-                  <input
-                    type="text"
-                    id="llmApiModel"
-                    name="llmApiModel"
-                    value={formData.llmApiModel}
-                    onChange={handleChange}
-                    required
-                    disabled
-                    placeholder="Please select an LLM provider first"
-                    className="block w-full px-4 py-3 rounded-lg border border-gray-300 bg-gray-100 text-gray-500 placeholder-gray-400 shadow-sm cursor-not-allowed dark:border-gray-600 dark:bg-gray-800 dark:text-gray-500 dark:placeholder-gray-500"
-                  />
-                )}
-              </div>
-            </div>
-          </div>
-
-            {/* SMTP Configuration Section */}
-            <div className="rounded-xl border border-gray-200 bg-white shadow-lg dark:border-gray-800 dark:bg-gray-900/50 backdrop-blur-sm p-6 sm:p-8">
-            <div className="flex items-center mb-6">
-              <div className="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center mr-3">
-                <svg className="w-5 h-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-              </div>
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Email Configuration</h2>
-            </div>
-            
-            <div className="space-y-5">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <div>
-                  <label htmlFor="smtpUser" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    SMTP Username <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    id="smtpUser"
-                    name="smtpUser"
-                    value={formData.smtpUser}
-                    onChange={handleChange}
-                    required
-                    placeholder="user@example.com"
-                    className="block w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 shadow-sm transition-all duration-200 focus:border-green-500 focus:ring-2 focus:ring-green-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500 dark:focus:border-green-400 dark:focus:ring-green-400/20"
-                  />
                 </div>
-                
+
                 <div>
-                  <label htmlFor="smtpPass" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    SMTP Password <span className="text-red-500">*</span>
+                  <label htmlFor="llmApiKey" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    API Key <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="password"
-                    id="smtpPass"
-                    name="smtpPass"
-                    value={formData.smtpPass}
+                    id="llmApiKey"
+                    name="llmApiKey"
+                    value={formData.llmApiKey}
                     onChange={handleChange}
                     required
-                    placeholder="••••••••"
-                    className="block w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 shadow-sm transition-all duration-200 focus:border-green-500 focus:ring-2 focus:ring-green-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500 dark:focus:border-green-400 dark:focus:ring-green-400/20"
+                    placeholder="sk-••••••••••••••••"
+                    className="block w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 shadow-sm transition-all duration-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500 dark:focus:border-purple-400 dark:focus:ring-purple-400/20"
                   />
                 </div>
-              </div>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+
                 <div>
-                  <label htmlFor="emailFrom" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    From Email <span className="text-red-500">*</span>
+                  <label htmlFor="llmApiModel" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Model Name <span className="text-red-500">*</span>
                   </label>
-                  <input
-                    type="email"
-                    id="emailFrom"
-                    name="emailFrom"
-                    value={formData.emailFrom}
-                    onChange={handleChange}
-                    required
-                    placeholder="sender@example.com"
-                    className="block w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 shadow-sm transition-all duration-200 focus:border-green-500 focus:ring-2 focus:ring-green-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500 dark:focus:border-green-400 dark:focus:ring-green-400/20"
-                  />
-                </div>
-                
-                <div>
-                  <label htmlFor="emailTo" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    To Email <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="email"
-                    id="emailTo"
-                    name="emailTo"
-                    value={formData.emailTo}
-                    onChange={handleChange}
-                    required
-                    placeholder="recipient@example.com"
-                    className="block w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 shadow-sm transition-all duration-200 focus:border-green-500 focus:ring-2 focus:ring-green-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500 dark:focus:border-green-400 dark:focus:ring-green-400/20"
-                  />
+                  {formData.llmType ? (
+                    <select
+                      id="llmApiModel"
+                      name="llmApiModel"
+                      value={formData.llmApiModel}
+                      onChange={handleChange}
+                      required
+                      className="block w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-900 shadow-sm transition-all duration-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:focus:border-purple-400 dark:focus:ring-purple-400/20"
+                    >
+                      <option value="">Select a model</option>
+                      {getModelOptions().map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input
+                      type="text"
+                      id="llmApiModel"
+                      name="llmApiModel"
+                      value={formData.llmApiModel}
+                      onChange={handleChange}
+                      required
+                      disabled
+                      placeholder="Please select an LLM provider first"
+                      className="block w-full px-4 py-3 rounded-lg border border-gray-300 bg-gray-100 text-gray-500 placeholder-gray-400 shadow-sm cursor-not-allowed dark:border-gray-600 dark:bg-gray-800 dark:text-gray-500 dark:placeholder-gray-500"
+                    />
+                  )}
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* API Key Section - Only shown in edit mode or after creation */}
-          {isEditMode && formData.notaifyApiKeyId && (
+            {/* SMTP Configuration Section */}
             <div className="rounded-xl border border-gray-200 bg-white shadow-lg dark:border-gray-800 dark:bg-gray-900/50 backdrop-blur-sm p-6 sm:p-8">
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center">
-                  <div className="w-10 h-10 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center mr-3">
-                    <svg className="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
-                    </svg>
-                  </div>
-                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Notaify API Key</h2>
+              <div className="flex items-center mb-6">
+                <div className="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center mr-3">
+                  <svg className="w-5 h-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
                 </div>
-                <button
-                  type="button"
-                  onClick={handleRegenerateApiKey}
-                  disabled={isRegenerating}
-                  className="inline-flex items-center justify-center gap-2 rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                  {isRegenerating ? (
-                    <>
-                      <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Regenerating...
-                    </>
-                  ) : (
-                    <>
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                      </svg>
-                      Regenerate Key
-                    </>
-                  )}
-                </button>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Email Configuration</h2>
               </div>
 
-              <div className="space-y-4">
-                {/* API ID */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">API ID</label>
-                  <div className="flex items-center gap-2">
-                    <code className="flex-1 rounded bg-gray-100 dark:bg-gray-800 px-4 py-3 font-mono text-sm text-gray-900 dark:text-white">
-                      {formData.notaifyApiKeyId}
-                    </code>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        navigator.clipboard.writeText(formData.notaifyApiKeyId || '');
-                        setSuccess('API ID copied to clipboard');
-                      }}
-                      className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2"
-                      title="Copy API ID"
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                      </svg>
-                    </button>
+              <div className="space-y-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <div>
+                    <label htmlFor="smtpUser" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      SMTP Username <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      id="smtpUser"
+                      name="smtpUser"
+                      value={formData.smtpUser}
+                      onChange={handleChange}
+                      required
+                      placeholder="user@example.com"
+                      className="block w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 shadow-sm transition-all duration-200 focus:border-green-500 focus:ring-2 focus:ring-green-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500 dark:focus:border-green-400 dark:focus:ring-green-400/20"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="smtpPass" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      SMTP Password <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="password"
+                      id="smtpPass"
+                      name="smtpPass"
+                      value={formData.smtpPass}
+                      onChange={handleChange}
+                      required
+                      placeholder="••••••••"
+                      className="block w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 shadow-sm transition-all duration-200 focus:border-green-500 focus:ring-2 focus:ring-green-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500 dark:focus:border-green-400 dark:focus:ring-green-400/20"
+                    />
                   </div>
                 </div>
 
-                {/* API Key */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">API Key (Secret)</label>
-                  <div className="flex items-center gap-2">
-                    <code className="flex-1 rounded bg-gray-100 dark:bg-gray-800 px-4 py-3 font-mono text-sm text-gray-900 dark:text-white">
-                      {visibleApiKey && formData.notaifyApiKey ? formData.notaifyApiKey : (formData.notaifyApiKey ? '•'.repeat(Math.min(formData.notaifyApiKey.length, 20)) : '-')}
-                    </code>
-                    {formData.notaifyApiKey && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  {/* Removed From Email input */}
+
+                  <div>
+                    <label htmlFor="emailTo" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      To Email <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="email"
+                      id="emailTo"
+                      name="emailTo"
+                      value={formData.emailTo}
+                      onChange={handleChange}
+                      required
+                      placeholder="recipient@example.com"
+                      className="block w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 shadow-sm transition-all duration-200 focus:border-green-500 focus:ring-2 focus:ring-green-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500 dark:focus:border-green-400 dark:focus:ring-green-400/20"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* API Key Section - Only shown in edit mode or after creation */}
+            {isEditMode && formData.notaifyApiKeyId && (
+              <div className="rounded-xl border border-gray-200 bg-white shadow-lg dark:border-gray-800 dark:bg-gray-900/50 backdrop-blur-sm p-6 sm:p-8">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center">
+                    <div className="w-10 h-10 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center mr-3">
+                      <svg className="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                      </svg>
+                    </div>
+                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Notaify API Key</h2>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleRegenerateApiKey}
+                    disabled={isRegenerating}
+                    className="inline-flex items-center justify-center gap-2 rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    {isRegenerating ? (
                       <>
-                        <button
-                          type="button"
-                          onClick={() => setVisibleApiKey(!visibleApiKey)}
-                          className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2"
-                          title={visibleApiKey ? 'Hide API Key' : 'Show API Key'}
-                        >
-                          {visibleApiKey ? (
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-4.803m5.596-3.856a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0z" />
-                            </svg>
-                          ) : (
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                            </svg>
-                          )}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            navigator.clipboard.writeText(formData.notaifyApiKey || '');
-                            setSuccess('API Key copied to clipboard');
-                          }}
-                          className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2"
-                          title="Copy API Key"
-                        >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                          </svg>
-                        </button>
+                        <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Regenerating...
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                        Regenerate Key
                       </>
                     )}
+                  </button>
+                </div>
+
+                <div className="space-y-4">
+                  {/* API ID */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">API ID</label>
+                    <div className="flex items-center gap-2">
+                      <code className="flex-1 rounded bg-gray-100 dark:bg-gray-800 px-4 py-3 font-mono text-sm text-gray-900 dark:text-white">
+                        {formData.notaifyApiKeyId}
+                      </code>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          navigator.clipboard.writeText(formData.notaifyApiKeyId || '');
+                          setSuccess('API ID copied to clipboard');
+                        }}
+                        className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2"
+                        title="Copy API ID"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* API Key */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">API Key (Secret)</label>
+                    <div className="flex items-center gap-2">
+                      <code className="flex-1 rounded bg-gray-100 dark:bg-gray-800 px-4 py-3 font-mono text-sm text-gray-900 dark:text-white">
+                        {visibleApiKey && formData.notaifyApiKey ? formData.notaifyApiKey : (formData.notaifyApiKey ? '•'.repeat(Math.min(formData.notaifyApiKey.length, 20)) : '-')}
+                      </code>
+                      {formData.notaifyApiKey && (
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => setVisibleApiKey(!visibleApiKey)}
+                            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2"
+                            title={visibleApiKey ? 'Hide API Key' : 'Show API Key'}
+                          >
+                            {visibleApiKey ? (
+                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-4.803m5.596-3.856a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0z" />
+                              </svg>
+                            ) : (
+                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                              </svg>
+                            )}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              navigator.clipboard.writeText(formData.notaifyApiKey || '');
+                              setSuccess('API Key copied to clipboard');
+                            }}
+                            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2"
+                            title="Copy API Key"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                            </svg>
+                          </button>
+                        </>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          )}
-          
+            )}
+
           </div>
 
           {/* Action Buttons - Full Width */}
