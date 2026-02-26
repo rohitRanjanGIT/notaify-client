@@ -25,9 +25,9 @@ model Project {
   llmApiKey   String?
   llmApiModel String?
 
-  smtpUser  String?
-  smtpPass  String?
-  emailTo   String?
+  smtpUser String?
+  smtpPass String?
+  emailTo  String?
 
   notaifyApiKey   String?
   notaifyApiKeyId String?
@@ -39,12 +39,13 @@ model Project {
 }
 
 model errorLog {
-  id         String   @id @default(uuid())
-  projectId  String
-  error      String
-  LLmType    LlmType
-  resolution String?
-  timestamp  DateTime @default(now())
+  id          String   @id @default(uuid())
+  projectId   String
+  error       String
+  LLmType     LlmType
+  llmApiModel String?
+  resolution  String?
+  timestamp   DateTime @default(now())
 
   @@map("error_logs")
 }

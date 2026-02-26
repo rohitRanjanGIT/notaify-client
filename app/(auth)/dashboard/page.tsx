@@ -14,6 +14,11 @@ import {
   FolderOpen,
   Search,
   Sparkles,
+  Mail,
+  Brain,
+  Loader2,
+  CheckCircle2,
+  FlaskConical,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -52,8 +57,10 @@ export default function DashboardPage() {
   const [projects, setProjects] = useState<ProjectConfig[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [testingConfigId, setTestingConfigId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -119,6 +126,73 @@ export default function DashboardPage() {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
+  const handleTestConfigs = async (projectId: string, hasLlm: boolean) => {
+    setTestingConfigId(projectId);
+    setError(null);
+    setSuccess(null);
+
+    try {
+      if (hasLlm) {
+        // Run both tests if LLM is configured (since LLM needs Mail to send results anyway)
+        const [mailRes, llmRes] = await Promise.allSettled([
+          fetch('/api/package/nodexp/trialMail', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ project_id: projectId }),
+          }),
+          fetch('/api/package/nodexp/trialLlm', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ project_id: projectId }),
+          })
+        ]);
+
+        let allSuccess = true;
+        let messages = [];
+
+        if (mailRes.status === 'fulfilled' && mailRes.value.ok) {
+          messages.push('SMTP Test Email Sent');
+        } else {
+          allSuccess = false;
+          messages.push('SMTP Test Failed');
+        }
+
+        if (llmRes.status === 'fulfilled' && llmRes.value.ok) {
+          messages.push('LLM Integration Successful');
+        } else {
+          allSuccess = false;
+          messages.push('LLM Test Failed');
+        }
+
+        if (allSuccess) {
+          setSuccess('All Configurations Verified: ' + messages.join(' & ') + '!');
+        } else {
+          setError('Some tests failed: ' + messages.join(', '));
+        }
+
+      } else {
+        // Only run Mail test if no LLM configured
+        const response = await fetch('/api/package/nodexp/trialMail', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ project_id: projectId }),
+        });
+        const data = await response.json();
+
+        if (response.ok && data.message === 'success') {
+          setSuccess(data.data || 'SMTP Test Email Sent successfully!');
+        } else {
+          setError(data.error || 'Failed to send test email.');
+        }
+      }
+    } catch (err) {
+      console.error('Test config error:', err);
+      setError('Network error testing configurations.');
+    } finally {
+      setTestingConfigId(null);
+    }
+  };
+
   const formatDate = (date?: Date) => {
     if (!date) return '—';
     return new Date(date).toLocaleDateString('en-US', {
@@ -178,12 +252,19 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Error */}
+          {/* Error and Success Alerts */}
           {error && (
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
               <AlertTitle>Error</AlertTitle>
               <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+          {success && (
+            <Alert className="border-green-200 bg-green-50 text-green-900 dark:border-green-900 dark:bg-green-950/30 dark:text-green-100 [&>svg]:text-green-600 dark:[&>svg]:text-green-400">
+              <CheckCircle2 className="h-4 w-4" />
+              <AlertTitle>Success</AlertTitle>
+              <AlertDescription>{success}</AlertDescription>
             </Alert>
           )}
 
@@ -366,6 +447,31 @@ export default function DashboardPage() {
                           {/* Actions */}
                           <TableCell className="text-right pr-5">
                             <div className="flex items-center justify-end gap-0.5">
+                              {/* Quick Actions (Test Configs) */}
+                              {(project.smtpUser || project.llmType) && (
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-7 w-7 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:text-blue-500 dark:hover:text-blue-400 dark:hover:bg-blue-950/30"
+                                      onClick={() => handleTestConfigs(project.project_id, !!project.llmType)}
+                                      disabled={testingConfigId === project.project_id}
+                                    >
+                                      {testingConfigId === project.project_id ? (
+                                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                      ) : (
+                                        <FlaskConical className="h-3.5 w-3.5" />
+                                      )}
+                                      <span className="sr-only">Test LLM & Mail</span>
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent side="bottom"><p>Test LLM & Mail</p></TooltipContent>
+                                </Tooltip>
+                              )}
+
+                              <div className="w-px h-4 bg-border mx-1 hidden sm:block"></div>
+
                               <Tooltip>
                                 <TooltipTrigger asChild>
                                   <Button
