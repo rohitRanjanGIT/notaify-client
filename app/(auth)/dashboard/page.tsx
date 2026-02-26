@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useAuth } from '@clerk/nextjs';
+import { useState, useEffect, useMemo } from 'react';
+import { useAuth, useUser } from '@clerk/nextjs';
 import { ProjectConfig } from '@/lib/types/types';
 import Link from 'next/link';
 import {
@@ -9,17 +9,14 @@ import {
   Trash2,
   Edit2,
   Copy,
-  Eye,
-  EyeOff,
+  Check,
   AlertCircle,
   FolderOpen,
-  Layers,
-  Brain,
-  Mail,
-  Check,
+  Search,
   Sparkles,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   Table,
   TableBody,
@@ -29,13 +26,6 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -49,24 +39,22 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { Separator } from '@/components/ui/separator';
 
 export default function DashboardPage() {
   const { userId } = useAuth();
+  const { user } = useUser();
   const [projects, setProjects] = useState<ProjectConfig[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [visibleKeys, setVisibleKeys] = useState<Set<string>>(new Set());
+  const [searchQuery, setSearchQuery] = useState('');
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  // Load projects from backend
   useEffect(() => {
     const fetchProjects = async () => {
       if (!userId) return;
@@ -80,7 +68,6 @@ export default function DashboardPage() {
 
         const { projects: fetchedProjects } = await response.json();
 
-        // Transform backend data to match ProjectConfig
         const transformedProjects: ProjectConfig[] = fetchedProjects.map((p: any) => ({
           project_id: p.id,
           projectName: p.projectName,
@@ -126,100 +113,72 @@ export default function DashboardPage() {
     }
   };
 
-  const toggleKeyVisibility = (projectId: string) => {
-    const newVisible = new Set(visibleKeys);
-    if (newVisible.has(projectId)) {
-      newVisible.delete(projectId);
-    } else {
-      newVisible.add(projectId);
-    }
-    setVisibleKeys(newVisible);
-  };
-
-  const formatDate = (date?: Date) => {
-    if (!date) return '-';
-    return new Date(date).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
-  };
-
-  const maskApiKey = (key: string) => {
-    if (!key) return '-';
-    if (key.length <= 8) return key;
-    return key.slice(0, 4) + '•'.repeat(Math.min(key.length - 8, 16)) + key.slice(-4);
-  };
-
   const copyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
     setCopiedId(label);
     setTimeout(() => setCopiedId(null), 2000);
   };
 
+  const formatDate = (date?: Date) => {
+    if (!date) return '—';
+    return new Date(date).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    });
+  };
+
   // Stats
   const totalProjects = projects.length;
   const activeLLMs = projects.filter((p) => p.llmType).length;
   const emailConfigured = projects.filter((p) => p.smtpUser).length;
+  const apiKeysGenerated = projects.filter((p) => p.notaifyApiKey).length;
 
-  const stats = [
-    {
-      label: 'Total Projects',
-      value: totalProjects,
-      icon: Layers,
-      color: 'text-blue-600 dark:text-blue-400',
-      bg: 'bg-blue-50 dark:bg-blue-950/40',
-    },
-    {
-      label: 'LLM Configured',
-      value: activeLLMs,
-      icon: Brain,
-      color: 'text-purple-600 dark:text-purple-400',
-      bg: 'bg-purple-50 dark:bg-purple-950/40',
-    },
-    {
-      label: 'Email Enabled',
-      value: emailConfigured,
-      icon: Mail,
-      color: 'text-green-600 dark:text-green-400',
-      bg: 'bg-green-50 dark:bg-green-950/40',
-    },
-  ];
+  // Search
+  const filteredProjects = useMemo(() => {
+    if (!searchQuery.trim()) return projects;
+    const q = searchQuery.toLowerCase();
+    return projects.filter(
+      (p) =>
+        p.projectName.toLowerCase().includes(q) ||
+        (p.llmType && p.llmType.toLowerCase().includes(q)) ||
+        (p.llmApiModel && p.llmApiModel.toLowerCase().includes(q))
+    );
+  }, [projects, searchQuery]);
 
-  const getLLMBadgeVariant = (type: string) => {
-    switch (type) {
-      case 'openai':
-        return 'default';
-      case 'claude':
-        return 'secondary';
-      case 'google':
-        return 'outline';
-      default:
-        return 'secondary';
-    }
-  };
+  const displayName = user?.firstName
+    ? `${user.firstName}'s projects`
+    : 'Your projects';
 
   return (
     <TooltipProvider>
-      <main className="min-h-screen bg-muted/40 p-4 sm:p-6 lg:p-8">
-        <div className="mx-auto max-w-7xl space-y-6">
+      <main className="min-h-screen bg-background px-4 py-8 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-6xl space-y-8">
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-              <p className="text-muted-foreground mt-1 text-sm">
-                Manage your projects, API keys, and integrations.
-              </p>
+            <h1 className="text-2xl font-semibold tracking-tight">{displayName}</h1>
+            <div className="flex items-center gap-3">
+              <Link href="/dashboard/addProject">
+                <Button variant="outline" size="sm">
+                  New project
+                </Button>
+              </Link>
+              <div className="relative w-56">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  placeholder="Search..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-9 h-8 text-sm"
+                />
+              </div>
             </div>
-            <Link href="/dashboard/addProject">
-              <Button size="lg" className="shadow-sm">
-                <Plus className="mr-2 h-4 w-4" />
-                New Project
-              </Button>
-            </Link>
           </div>
 
-          {/* Error Message */}
+          {/* Error */}
           {error && (
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
@@ -228,234 +187,200 @@ export default function DashboardPage() {
             </Alert>
           )}
 
-          {/* Stats Cards */}
+          {/* Stats Row */}
           {!isLoading && projects.length > 0 && (
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {stats.map((stat) => (
-                <Card key={stat.label} className="overflow-hidden">
-                  <CardContent className="p-5">
-                    <div className="flex items-center gap-4">
-                      <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-lg ${stat.bg}`}>
-                        <stat.icon className={`h-5 w-5 ${stat.color}`} />
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-muted-foreground">{stat.label}</p>
-                        <p className="text-2xl font-bold tracking-tight">{stat.value}</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+            <div className="rounded-lg border border-border">
+              <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-border">
+                <div className="px-5 py-4">
+                  <p className="text-xs text-muted-foreground mb-1">📁 Projects</p>
+                  <p className="text-lg font-semibold">{totalProjects}</p>
+                </div>
+                <div className="px-5 py-4">
+                  <p className="text-xs text-muted-foreground mb-1">🤖 LLM configured</p>
+                  <p className="text-lg font-semibold">{activeLLMs}</p>
+                </div>
+                <div className="px-5 py-4">
+                  <p className="text-xs text-muted-foreground mb-1">📧 Email enabled</p>
+                  <p className="text-lg font-semibold">{emailConfigured}</p>
+                </div>
+                <div className="px-5 py-4">
+                  <p className="text-xs text-muted-foreground mb-1">🔑 API keys</p>
+                  <p className="text-lg font-semibold">{apiKeysGenerated}</p>
+                </div>
+              </div>
             </div>
           )}
 
           {/* Loading State */}
           {isLoading ? (
-            <Card>
-              <CardHeader>
-                <CardTitle>
-                  <Skeleton className="h-6 w-[150px]" />
-                </CardTitle>
-                <CardDescription>
-                  <Skeleton className="h-4 w-[250px]" />
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
+            <div className="space-y-6">
+              <Skeleton className="h-[72px] w-full rounded-lg" />
+              <Skeleton className="h-5 w-28" />
+              <Skeleton className="h-9 w-full rounded-md" />
+              <div className="space-y-0 rounded-lg border border-border overflow-hidden">
                 {[...Array(3)].map((_, i) => (
-                  <div key={i} className="flex items-center gap-4">
-                    <Skeleton className="h-10 w-10 rounded-lg" />
-                    <div className="flex-1 space-y-2">
-                      <Skeleton className="h-4 w-[200px]" />
-                      <Skeleton className="h-3 w-[300px]" />
-                    </div>
-                    <Skeleton className="h-8 w-20" />
+                  <div key={i} className="flex items-center gap-6 px-5 py-4 border-b border-border last:border-0">
+                    <Skeleton className="h-4 w-[120px]" />
+                    <Skeleton className="h-4 w-[160px]" />
+                    <Skeleton className="h-4 w-[140px]" />
+                    <Skeleton className="h-4 w-[100px]" />
                   </div>
                 ))}
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           ) : projects.length === 0 ? (
             /* Empty State */
-            <Card className="border-dashed">
-              <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted mb-4">
-                  <FolderOpen className="h-8 w-8 text-muted-foreground" />
-                </div>
-                <h3 className="text-lg font-semibold mb-1">No projects yet</h3>
-                <p className="text-sm text-muted-foreground max-w-sm mb-6">
-                  Create your first project to get started with Notaify. Configure LLM providers, email alerts, and generate API keys.
-                </p>
-                <Link href="/dashboard/addProject">
-                  <Button>
-                    <Sparkles className="mr-2 h-4 w-4" />
-                    Create Your First Project
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
+            <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-border py-20 text-center">
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-muted mb-4">
+                <FolderOpen className="h-6 w-6 text-muted-foreground" />
+              </div>
+              <h3 className="text-base font-semibold mb-1">No projects yet</h3>
+              <p className="text-sm text-muted-foreground max-w-xs mb-6">
+                Get started by creating your first project. Configure LLM providers, email alerts, and generate API keys.
+              </p>
+              <Link href="/dashboard/addProject">
+                <Button size="sm">
+                  <Sparkles className="mr-2 h-3.5 w-3.5" />
+                  Create your first project
+                </Button>
+              </Link>
+            </div>
           ) : (
-            /* Projects Table */
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg">Your Projects</CardTitle>
-                <CardDescription>
-                  {totalProjects} project{totalProjects !== 1 ? 's' : ''} configured
-                </CardDescription>
-              </CardHeader>
-              <Separator />
-              <CardContent className="p-0">
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
+            <>
+              {/* Project Count */}
+              <h2 className="text-base font-semibold">
+                {totalProjects} Project{totalProjects !== 1 ? 's' : ''}
+              </h2>
+
+              {/* Projects Table */}
+              <div className="rounded-lg border border-border overflow-hidden">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="hover:bg-transparent">
+                      <TableHead className="pl-5 text-xs font-medium text-muted-foreground">Name</TableHead>
+                      <TableHead className="text-xs font-medium text-muted-foreground">LLM Provider</TableHead>
+                      <TableHead className="text-xs font-medium text-muted-foreground">Model</TableHead>
+                      <TableHead className="text-xs font-medium text-muted-foreground">Created at</TableHead>
+                      <TableHead className="text-xs font-medium text-muted-foreground">API Key / ID</TableHead>
+                      <TableHead className="text-xs font-medium text-muted-foreground text-right pr-5">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredProjects.length === 0 ? (
                       <TableRow>
-                        <TableHead className="pl-6">Project Name</TableHead>
-                        <TableHead>LLM</TableHead>
-                        <TableHead>API ID</TableHead>
-                        <TableHead>API Key</TableHead>
-                        <TableHead>Created</TableHead>
-                        <TableHead className="text-right pr-6">Actions</TableHead>
+                        <TableCell colSpan={6} className="text-center py-10 text-sm text-muted-foreground">
+                          No projects match &ldquo;{searchQuery}&rdquo;
+                        </TableCell>
                       </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {projects.map((project) => (
+                    ) : (
+                      filteredProjects.map((project) => (
                         <TableRow key={project.project_id} className="group">
-                          {/* Project Name */}
-                          <TableCell className="pl-6">
-                            <div className="flex flex-col">
-                              <span className="font-medium">{project.projectName}</span>
-                              {project.description && (
-                                <span className="text-xs text-muted-foreground truncate max-w-[200px]">
-                                  {project.description}
-                                </span>
-                              )}
-                            </div>
+                          {/* Name */}
+                          <TableCell className="pl-5 font-medium">
+                            <Link
+                              href={`/dashboard/addProject?id=${project.project_id}`}
+                              className="hover:underline underline-offset-4"
+                            >
+                              {project.projectName}
+                            </Link>
                           </TableCell>
 
-                          {/* LLM Type */}
+                          {/* LLM Provider */}
                           <TableCell>
                             {project.llmType ? (
-                              <Badge variant={getLLMBadgeVariant(project.llmType)} className="uppercase text-[10px] font-semibold">
-                                {project.llmType}
-                              </Badge>
+                              <span className="text-sm capitalize">{project.llmType}</span>
                             ) : (
-                              <span className="text-xs text-muted-foreground">—</span>
+                              <span className="text-sm text-muted-foreground">—</span>
                             )}
                           </TableCell>
 
-                          {/* API ID */}
+                          {/* Model */}
                           <TableCell>
-                            <div className="flex items-center gap-1.5">
-                              <code className="rounded bg-muted px-2 py-1 font-mono text-xs text-muted-foreground">
-                                {project.notaifyApiKeyId
-                                  ? project.notaifyApiKeyId.slice(0, 12) + '…'
-                                  : '—'}
-                              </code>
+                            {project.llmApiModel ? (
+                              <Badge variant="secondary" className="font-mono text-[11px] font-normal">
+                                {project.llmApiModel}
+                              </Badge>
+                            ) : (
+                              <span className="text-sm text-muted-foreground">—</span>
+                            )}
+                          </TableCell>
+
+                          {/* Created */}
+                          <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
+                            {formatDate(project.createdAt)}
+                          </TableCell>
+
+                          {/* API Key / ID */}
+                          <TableCell className="pl-2">
+                            <div className="flex items-center gap-1 -ml-2">
                               {project.notaifyApiKeyId && (
                                 <Tooltip>
                                   <TooltipTrigger asChild>
                                     <Button
                                       variant="ghost"
-                                      size="icon"
-                                      className="h-6 w-6 text-muted-foreground hover:text-foreground"
-                                      onClick={() =>
-                                        copyToClipboard(project.notaifyApiKeyId || '', `id-${project.project_id}`)
-                                      }
+                                      size="sm"
+                                      className="h-7 px-2 text-xs text-muted-foreground hover:text-foreground gap-1.5"
+                                      onClick={() => copyToClipboard(project.notaifyApiKeyId || '', `id-${project.project_id}`)}
                                     >
                                       {copiedId === `id-${project.project_id}` ? (
                                         <Check className="h-3 w-3 text-green-500" />
                                       ) : (
                                         <Copy className="h-3 w-3" />
                                       )}
-                                      <span className="sr-only">Copy API ID</span>
+                                      API ID
                                     </Button>
                                   </TooltipTrigger>
-                                  <TooltipContent>
+                                  <TooltipContent side="bottom">
                                     <p>{copiedId === `id-${project.project_id}` ? 'Copied!' : 'Copy API ID'}</p>
                                   </TooltipContent>
                                 </Tooltip>
                               )}
-                            </div>
-                          </TableCell>
-
-                          {/* API Key */}
-                          <TableCell>
-                            <div className="flex items-center gap-1.5">
-                              <code className="rounded bg-muted px-2 py-1 font-mono text-xs text-muted-foreground max-w-[140px] truncate block">
-                                {visibleKeys.has(project.project_id)
-                                  ? project.notaifyApiKey || '—'
-                                  : maskApiKey(project.notaifyApiKey || '')}
-                              </code>
                               {project.notaifyApiKey && (
-                                <div className="flex items-center gap-0.5">
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="h-6 w-6 text-muted-foreground hover:text-foreground"
-                                        onClick={() => toggleKeyVisibility(project.project_id)}
-                                      >
-                                        {visibleKeys.has(project.project_id) ? (
-                                          <EyeOff className="h-3 w-3" />
-                                        ) : (
-                                          <Eye className="h-3 w-3" />
-                                        )}
-                                        <span className="sr-only">Toggle visibility</span>
-                                      </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                      <p>{visibleKeys.has(project.project_id) ? 'Hide' : 'Show'} API Key</p>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="h-6 w-6 text-muted-foreground hover:text-foreground"
-                                        onClick={() =>
-                                          copyToClipboard(project.notaifyApiKey || '', `key-${project.project_id}`)
-                                        }
-                                      >
-                                        {copiedId === `key-${project.project_id}` ? (
-                                          <Check className="h-3 w-3 text-green-500" />
-                                        ) : (
-                                          <Copy className="h-3 w-3" />
-                                        )}
-                                        <span className="sr-only">Copy API Key</span>
-                                      </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                      <p>{copiedId === `key-${project.project_id}` ? 'Copied!' : 'Copy API Key'}</p>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                </div>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className="h-7 px-2 text-xs text-muted-foreground hover:text-foreground gap-1.5"
+                                      onClick={() => copyToClipboard(project.notaifyApiKey || '', `key-${project.project_id}`)}
+                                    >
+                                      {copiedId === `key-${project.project_id}` ? (
+                                        <Check className="h-3 w-3 text-green-500" />
+                                      ) : (
+                                        <Copy className="h-3 w-3" />
+                                      )}
+                                      API Key
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent side="bottom">
+                                    <p>{copiedId === `key-${project.project_id}` ? 'Copied!' : 'Copy API Key'}</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              )}
+                              {!project.notaifyApiKeyId && !project.notaifyApiKey && (
+                                <span className="text-sm text-muted-foreground">—</span>
                               )}
                             </div>
                           </TableCell>
 
-                          {/* Created Date */}
-                          <TableCell className="text-muted-foreground text-sm whitespace-nowrap">
-                            {formatDate(project.createdAt)}
-                          </TableCell>
-
                           {/* Actions */}
-                          <TableCell className="text-right pr-6">
-                            <div className="flex items-center justify-end gap-1">
+                          <TableCell className="text-right pr-5">
+                            <div className="flex items-center justify-end gap-0.5">
                               <Tooltip>
                                 <TooltipTrigger asChild>
                                   <Button
                                     variant="ghost"
                                     size="icon"
-                                    className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                                    className="h-7 w-7 text-muted-foreground hover:text-foreground"
                                     asChild
                                   >
                                     <Link href={`/dashboard/addProject?id=${project.project_id}`}>
-                                      <Edit2 className="h-4 w-4" />
-                                      <span className="sr-only">Edit Project</span>
+                                      <Edit2 className="h-3.5 w-3.5" />
+                                      <span className="sr-only">Edit</span>
                                     </Link>
                                   </Button>
                                 </TooltipTrigger>
-                                <TooltipContent><p>Edit Project</p></TooltipContent>
+                                <TooltipContent side="bottom"><p>Edit</p></TooltipContent>
                               </Tooltip>
 
                               <AlertDialog>
@@ -465,14 +390,14 @@ export default function DashboardPage() {
                                       <Button
                                         variant="ghost"
                                         size="icon"
-                                        className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                                        className="h-7 w-7 text-muted-foreground hover:text-destructive"
                                       >
-                                        <Trash2 className="h-4 w-4" />
-                                        <span className="sr-only">Delete Project</span>
+                                        <Trash2 className="h-3.5 w-3.5" />
+                                        <span className="sr-only">Delete</span>
                                       </Button>
                                     </AlertDialogTrigger>
                                   </TooltipTrigger>
-                                  <TooltipContent><p>Delete Project</p></TooltipContent>
+                                  <TooltipContent side="bottom"><p>Delete</p></TooltipContent>
                                 </Tooltip>
                                 <AlertDialogContent>
                                   <AlertDialogHeader>
@@ -495,12 +420,12 @@ export default function DashboardPage() {
                             </div>
                           </TableCell>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              </CardContent>
-            </Card>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            </>
           )}
         </div>
       </main>

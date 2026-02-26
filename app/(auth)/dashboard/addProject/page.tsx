@@ -22,6 +22,8 @@ import {
   CheckCircle2,
   ShieldAlert,
   FileText,
+  FlaskConical,
+  X,
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -96,6 +98,12 @@ export default function AddProjectPage() {
   const [originalFormData, setOriginalFormData] = useState<ProjectConfig | null>(null);
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [showRegenConfirm, setShowRegenConfirm] = useState(false);
+  const [isTestingAll, setIsTestingAll] = useState(false);
+  const [testResult, setTestResult] = useState<{
+    smtp: { type: 'success' | 'error' | 'pending'; message: string };
+    llm: { type: 'success' | 'error' | 'pending'; message: string };
+  } | null>(null);
+  const [isCustomModel, setIsCustomModel] = useState(false);
 
   useEffect(() => {
     if (!projectId) return;
@@ -132,6 +140,13 @@ export default function AddProjectPage() {
           };
           setFormData(loadedData);
           setOriginalFormData(loadedData);
+
+          // Check if the loaded model is custom
+          if (project.llmType && project.llmApiModel) {
+            // Function exists below but we can just do a basic check here or we evaluate on render.
+            // Let's rely on checking if the loaded value matches known options later, or simply assume it's custom 
+            // if it doesn't exist in the list. To keep it simple, we'll just check it when getting model options.
+          }
         }
       } catch (err) {
         console.error('Failed to load project config:', err);
@@ -159,13 +174,23 @@ export default function AddProjectPage() {
       llmType: value as ProjectConfig['llmType'],
       llmApiModel: '',
     }));
+    setIsCustomModel(false);
   };
 
   const handleModelChange = (value: string) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      llmApiModel: value,
-    }));
+    if (value === 'other') {
+      setIsCustomModel(true);
+      setFormData((prevData) => ({
+        ...prevData,
+        llmApiModel: '',
+      }));
+    } else {
+      setIsCustomModel(false);
+      setFormData((prevData) => ({
+        ...prevData,
+        llmApiModel: value,
+      }));
+    }
   };
 
   const handleRegenerateApiKey = async () => {
@@ -229,36 +254,57 @@ export default function AddProjectPage() {
     switch (formData.llmType) {
       case 'openai':
         return [
-          { value: 'gpt-4o', label: 'GPT-4o (Latest)' },
+          { value: 'gpt-5.2', label: 'GPT-5.2 (Latest Expert)' },
+          { value: 'gpt-5.1-chat-latest', label: 'GPT-5.1 Chat' },
+          { value: 'gpt-5.2-codex', label: 'GPT-5.2 Codex' },
+          { value: 'gpt-4.5-turbo', label: 'GPT-4.5 Turbo' },
+          { value: 'gpt-4o', label: 'GPT-4o' },
           { value: 'gpt-4o-mini', label: 'GPT-4o Mini' },
-          { value: 'o1', label: 'o1 (Reasoning)' },
-          { value: 'o1-mini', label: 'o1 Mini' },
           { value: 'o1-preview', label: 'o1 Preview' },
-          { value: 'gpt-4-turbo', label: 'GPT-4 Turbo' },
-          { value: 'gpt-4', label: 'GPT-4' },
-          { value: 'gpt-3.5-turbo', label: 'GPT-3.5 Turbo' },
+          { value: 'other', label: 'Other (Manual Entry)' },
         ];
       case 'claude':
         return [
-          { value: 'claude-3-5-sonnet-20241022', label: 'Claude 3.5 Sonnet (Latest)' },
+          { value: 'claude-opus-4-6', label: 'Claude 4.6 Opus (Latest)' },
+          { value: 'claude-sonnet-4-6', label: 'Claude 4.6 Sonnet' },
+          { value: 'claude-haiku-4-5', label: 'Claude 4.5 Haiku' },
+          { value: 'claude-3-5-sonnet-20241022', label: 'Claude 3.5 Sonnet' },
           { value: 'claude-3-5-haiku-20241022', label: 'Claude 3.5 Haiku' },
-          { value: 'claude-3-opus-20240229', label: 'Claude 3 Opus' },
-          { value: 'claude-3-sonnet-20240229', label: 'Claude 3 Sonnet' },
-          { value: 'claude-3-haiku-20240307', label: 'Claude 3 Haiku' },
+          { value: 'other', label: 'Other (Manual Entry)' },
         ];
       case 'google':
         return [
-          { value: 'gemini-2.0-flash-exp', label: 'Gemini 2.0 Flash (Experimental)' },
-          { value: 'gemini-1.5-pro-latest', label: 'Gemini 1.5 Pro (Latest)' },
-          { value: 'gemini-1.5-flash-latest', label: 'Gemini 1.5 Flash (Latest)' },
-          { value: 'gemini-1.5-pro', label: 'Gemini 1.5 Pro' },
-          { value: 'gemini-1.5-flash', label: 'Gemini 1.5 Flash' },
-          { value: 'gemini-1.0-pro', label: 'Gemini 1.0 Pro' },
+          { value: 'gemini-3.1-pro-preview', label: 'Gemini 3.1 Pro (Preview)' },
+          { value: 'gemini-3-flash-preview', label: 'Gemini 3 Flash (Preview)' },
+          { value: 'gemini-2.5-pro', label: 'Gemini 2.5 Pro (Stable)' },
+          { value: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash (Stable)' },
+          { value: 'gemini-2.5-flash-lite', label: 'Gemini 2.5 Flash Lite' },
+          { value: 'other', label: 'Other (Manual Entry)' },
         ];
       default:
         return [];
     }
   };
+
+  // Helper check for when loading initial data
+  useEffect(() => {
+    if (formData.llmType && formData.llmApiModel) {
+      // Inline the options check here to prevent useCallback/exhaustive-deps issues
+      let knownOptions: string[] = [];
+      if (formData.llmType === 'openai') {
+        knownOptions = ['gpt-5.2', 'gpt-5.1-chat-latest', 'gpt-5.2-codex', 'gpt-4.5-turbo', 'gpt-4o', 'gpt-4o-mini', 'o1-preview', 'other'];
+      } else if (formData.llmType === 'claude') {
+        knownOptions = ['claude-opus-4-6', 'claude-sonnet-4-6', 'claude-haiku-4-5', 'claude-3-5-sonnet-20241022', 'claude-3-5-haiku-20241022', 'other'];
+      } else if (formData.llmType === 'google') {
+        knownOptions = ['gemini-3.1-pro-preview', 'gemini-3-flash-preview', 'gemini-2.5-pro', 'gemini-2.5-flash', 'gemini-2.5-flash-lite', 'other'];
+      }
+
+      const isKnown = knownOptions.includes(formData.llmApiModel);
+      if (!isKnown && formData.llmApiModel !== '') {
+        setIsCustomModel(true);
+      }
+    }
+  }, [formData.llmType, formData.llmApiModel]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -399,6 +445,115 @@ export default function AddProjectPage() {
     setTimeout(() => setCopiedField(null), 2000);
   };
 
+  const handleTestAllConfigs = async () => {
+    // Basic validation
+    let hasError = false;
+    let initialSmtpState: { type: 'success' | 'error' | 'pending'; message: string } = { type: 'pending', message: 'Ready to test...' };
+    let initialLlmState: { type: 'success' | 'error' | 'pending'; message: string } = { type: 'pending', message: 'Ready to test...' };
+
+    if (!formData.smtpUser || !formData.smtpPass || !formData.emailTo) {
+      initialSmtpState = { type: 'error', message: 'Missing required SMTP fields (User, Pass, To Email).' };
+      hasError = true;
+    }
+    if (!formData.llmType || !formData.llmApiKey || !formData.llmApiModel) {
+      initialLlmState = { type: 'error', message: 'Missing required LLM API fields (Provider, Key, Model).' };
+      hasError = true;
+    } else if (hasError && initialLlmState.type !== 'error') {
+      // If LLM is fine but SMTP failed, LLM would fail too (it needs SMTP)
+      initialLlmState = { type: 'error', message: 'LLM config requires valid SMTP credentials to test.' };
+    }
+
+    setTestResult({ smtp: initialSmtpState, llm: initialLlmState });
+
+    if (hasError) return;
+
+    setIsTestingAll(true);
+    setTestResult({
+      smtp: { type: 'pending', message: 'Testing SMTP credentials...' },
+      llm: { type: 'pending', message: 'Testing LLM generated error via API...' }
+    });
+
+    try {
+      // Run both API requests concurrently
+      const [smtpRes, llmRes] = await Promise.allSettled([
+        fetch('/api/package/nodexp/trialMail', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            smtpUser: formData.smtpUser,
+            smtpPass: formData.smtpPass,
+            emailTo: formData.emailTo,
+          }),
+        }),
+        fetch('/api/package/nodexp/trialLlm', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            provider: formData.llmType,
+            apiKey: formData.llmApiKey,
+            modelName: formData.llmApiModel,
+            smtpUser: formData.smtpUser,
+            smtpPass: formData.smtpPass,
+            emailTo: formData.emailTo,
+          }),
+        })
+      ]);
+
+      setTestResult(prev => {
+        const newResult = {
+          smtp: prev?.smtp || { type: 'error', message: 'Failed' },
+          llm: prev?.llm || { type: 'error', message: 'Failed' }
+        };
+
+        // Handle SMTP Results
+        if (smtpRes.status === 'fulfilled') {
+          smtpRes.value.json().then(data => {
+            setTestResult(cur => ({
+              ...cur!,
+              smtp: smtpRes.value.ok && data.message === 'success'
+                ? { type: 'success', message: data.data || 'SMTP setup is valid!' }
+                : { type: 'error', message: data.error || 'Failed to authenticate SMTP.' }
+            }));
+          });
+        } else {
+          newResult.smtp = { type: 'error', message: 'Network error communicating with SMTP test route.' };
+        }
+
+        // Handle LLM Results
+        if (llmRes.status === 'fulfilled') {
+          llmRes.value.json().then(data => {
+            setTestResult(cur => ({
+              ...cur!,
+              llm: llmRes.value.ok && data.message === 'success'
+                ? { type: 'success', message: 'LLM Key valid & test generated!' }
+                : { type: 'error', message: data.error || 'LLM error validation failed.' }
+            }));
+          });
+        } else {
+          newResult.llm = { type: 'error', message: 'Network error communicating with LLM test route.' };
+        }
+
+        return newResult;
+      });
+
+    } catch (err) {
+      console.error('Unified test error:', err);
+    } finally {
+      // Give the promises a moment to parse JSON before unlocking the button
+      setTimeout(() => setIsTestingAll(false), 800);
+    }
+  };
+
+  const handleCancel = () => {
+    if (isEditMode && originalFormData) {
+      setFormData(originalFormData);
+      setError(null);
+      setSuccess(null);
+      setTestResult(null);
+    }
+    router.push('/dashboard');
+  };
+
   return (
     <TooltipProvider>
       <main className="min-h-screen bg-muted/40 p-4 sm:p-6 lg:p-8">
@@ -511,6 +666,55 @@ export default function AddProjectPage() {
                     </Select>
                   </div>
 
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="llmApiModel">
+                        Model <span className="text-destructive">*</span>
+                      </Label>
+                      {formData.llmType ? (
+                        <Select
+                          value={isCustomModel ? 'other' : (formData.llmApiModel || undefined)}
+                          onValueChange={handleModelChange}
+                          required
+                        >
+                          <SelectTrigger id="llmApiModel">
+                            <SelectValue placeholder="Select a model" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {getModelOptions().map((option) => (
+                              <SelectItem key={option.value} value={option.value}>
+                                {option.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      ) : (
+                        <Input
+                          id="llmApiModel"
+                          disabled
+                          placeholder="Select an LLM provider first"
+                          className="cursor-not-allowed"
+                        />
+                      )}
+                    </div>
+
+                    {isCustomModel && (
+                      <div className="space-y-2 animate-in fade-in slide-in-from-top-2">
+                        <Label htmlFor="customModelInput" className="text-muted-foreground text-xs">
+                          Enter Custom Model ID <span className="text-destructive">*</span>
+                        </Label>
+                        <Input
+                          id="customModelInput"
+                          name="llmApiModel"
+                          value={formData.llmApiModel}
+                          onChange={handleChange}
+                          placeholder="e.g. gemini-1.5-pro-exp-0827"
+                          required
+                        />
+                      </div>
+                    )}
+                  </div>
+
                   <div className="space-y-2">
                     <Label htmlFor="llmApiKey">
                       API Key <span className="text-destructive">*</span>
@@ -526,36 +730,6 @@ export default function AddProjectPage() {
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="llmApiModel">
-                      Model <span className="text-destructive">*</span>
-                    </Label>
-                    {formData.llmType ? (
-                      <Select
-                        value={formData.llmApiModel || undefined}
-                        onValueChange={handleModelChange}
-                        required
-                      >
-                        <SelectTrigger id="llmApiModel">
-                          <SelectValue placeholder="Select a model" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {getModelOptions().map((option) => (
-                            <SelectItem key={option.value} value={option.value}>
-                              {option.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    ) : (
-                      <Input
-                        id="llmApiModel"
-                        disabled
-                        placeholder="Select an LLM provider first"
-                        className="cursor-not-allowed"
-                      />
-                    )}
-                  </div>
                 </CardContent>
               </Card>
 
@@ -614,9 +788,95 @@ export default function AddProjectPage() {
                       placeholder="recipient@example.com"
                     />
                   </div>
+
                 </CardContent>
               </Card>
             </div>
+
+            {/* Unified Test Configuration Section */}
+            <Card className="border-dashed border-2 bg-slate-50 border-slate-200 dark:bg-slate-900/30 dark:border-slate-800">
+              <CardContent className="pt-6">
+                <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between mb-4">
+                  <div>
+                    <h3 className="text-lg font-medium flex items-center gap-2">
+                      <FlaskConical className="h-5 w-5 text-blue-500" />
+                      Test Your Configurations
+                    </h3>
+                    <p className="text-sm text-muted-foreground">Verify both LLM and SMTP integrations before saving.</p>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full sm:w-auto shrink-0 border-blue-200 bg-white text-blue-700 hover:bg-blue-50 hover:text-blue-800 dark:border-blue-800 dark:bg-slate-950 dark:text-blue-400 dark:hover:bg-blue-900/30"
+                    onClick={handleTestAllConfigs}
+                    disabled={isTestingAll}
+                  >
+                    {isTestingAll ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Running Tests…
+                      </>
+                    ) : (
+                      <>
+                        Test Both Features
+                      </>
+                    )}
+                  </Button>
+                </div>
+
+                {testResult && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 top-border border-t pt-4">
+                    {/* SMTP Result Card */}
+                    <Alert
+                      variant={testResult.smtp.type === 'error' ? 'destructive' : 'default'}
+                      className={
+                        testResult.smtp.type === 'success'
+                          ? 'border-green-200 bg-green-50 text-green-900 dark:border-green-900 dark:bg-green-950/30 dark:text-green-100'
+                          : testResult.smtp.type === 'pending'
+                            ? 'border-blue-200 bg-blue-50 text-blue-900 dark:border-blue-900 dark:bg-blue-950/30 dark:text-blue-100'
+                            : ''
+                      }
+                    >
+                      {testResult.smtp.type === 'success' ? (
+                        <CheckCircle2 className="h-4 w-4 !text-green-600 dark:!text-green-400" />
+                      ) : testResult.smtp.type === 'error' ? (
+                        <AlertCircle className="h-4 w-4" />
+                      ) : (
+                        <Loader2 className="h-4 w-4 animate-spin !text-blue-600 dark:!text-blue-400" />
+                      )}
+                      <AlertTitle className="text-sm font-medium">SMTP Connection</AlertTitle>
+                      <AlertDescription className="text-xs">
+                        {testResult.smtp.message}
+                      </AlertDescription>
+                    </Alert>
+
+                    {/* LLM Result Card */}
+                    <Alert
+                      variant={testResult.llm.type === 'error' ? 'destructive' : 'default'}
+                      className={
+                        testResult.llm.type === 'success'
+                          ? 'border-green-200 bg-green-50 text-green-900 dark:border-green-900 dark:bg-green-950/30 dark:text-green-100'
+                          : testResult.llm.type === 'pending'
+                            ? 'border-purple-200 bg-purple-50 text-purple-900 dark:border-purple-900 dark:bg-purple-950/30 dark:text-purple-100'
+                            : ''
+                      }
+                    >
+                      {testResult.llm.type === 'success' ? (
+                        <CheckCircle2 className="h-4 w-4 !text-green-600 dark:!text-green-400" />
+                      ) : testResult.llm.type === 'error' ? (
+                        <AlertCircle className="h-4 w-4" />
+                      ) : (
+                        <Loader2 className="h-4 w-4 animate-spin !text-purple-600 dark:!text-purple-400" />
+                      )}
+                      <AlertTitle className="text-sm font-medium">LLM API Call</AlertTitle>
+                      <AlertDescription className="text-xs">
+                        {testResult.llm.message}
+                      </AlertDescription>
+                    </Alert>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
 
             {/* API Key Section (Edit Mode) */}
             {isEditMode && formData.notaifyApiKeyId && (
@@ -737,11 +997,15 @@ export default function AddProjectPage() {
             {/* Action Buttons */}
             <Card className="bg-muted/30">
               <CardContent className="flex flex-col-reverse sm:flex-row justify-end gap-3 py-4">
-                <Link href="/dashboard">
-                  <Button type="button" variant="outline" className="w-full sm:w-auto">
-                    Cancel
-                  </Button>
-                </Link>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full sm:w-auto"
+                  onClick={handleCancel}
+                >
+                  <X className="mr-2 h-4 w-4" />
+                  Cancel
+                </Button>
                 <Button type="submit" disabled={isLoading} className="w-full sm:w-auto">
                   {isLoading ? (
                     <>
