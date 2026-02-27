@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma/prisma';
 import nodemailer from 'nodemailer';
 
+/**
+ * Handles SMTP verification requests.
+ * Sends a test email using the provided credentials (or project-based config)
+ * to ensure that the SMTP settings are correctly configured and working.
+ */
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();

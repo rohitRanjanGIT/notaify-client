@@ -618,6 +618,7 @@ export const ErrorLogScalarFieldEnum = {
   projectId: 'projectId',
   error: 'error',
   LLmType: 'LLmType',
+  llmApiModel: 'llmApiModel',
   resolution: 'resolution',
   timestamp: 'timestamp'
 } as const

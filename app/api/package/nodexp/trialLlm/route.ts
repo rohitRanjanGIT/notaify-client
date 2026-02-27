@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { testLlmConfigAndSendEmail } from '@/lib/controllerHelper/LLMgenerator';
 import { prisma } from '@/lib/prisma/prisma';
 
+/**
+ * Handles LLM verification requests.
+ * Analyzes a sample error using the provided LLM credentials and emails the result
+ * to the specified address to verify both LLM and SMTP configurations.
+ */
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
