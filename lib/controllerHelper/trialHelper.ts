@@ -1,20 +1,16 @@
 import { prisma } from '@/lib/prisma/prisma';
-import { testLlmConfigAndSendEmail } from '@/lib/controllerHelper/LLMgenerator';
 import nodemailer from 'nodemailer';
+import { findProjectByApiCredentials } from '@/lib/utils/encryption';
 
-export async function processTrialLlm(body: any) {
+export async function processTrialLlm(body: Record<string, string>) {
     let provider = body.provider;
     let llmApiKey = body.llmApiKey;
     let modelName = body.modelName;
+    let projectId: string | null = null;
 
     // Support fetching config from DB via notaify key and password (API Key ID and API Key)
     if (body.apiKeyId && body.apiKey) {
-        const currentProject = await prisma.project.findFirst({
-            where: {
-                notaifyApiKeyId: body.apiKeyId,
-                notaifyApiKey: body.apiKey,
-            },
-        });
+        const currentProject = await findProjectByApiCredentials(body.apiKeyId, body.apiKey);
 
         if (!currentProject) {
             return { status: 404, error: 'Project not found or invalid credentials' };
@@ -24,9 +20,10 @@ export async function processTrialLlm(body: any) {
             return { status: 400, error: 'Project is missing LLM configuration.' };
         }
 
-        provider = currentProject.llmType;
-        llmApiKey = currentProject.llmApiKey;
-        modelName = currentProject.llmApiModel;
+        provider = currentProject.llmType as string;
+        llmApiKey = currentProject.llmApiKey as string;
+        modelName = currentProject.llmApiModel as string;
+        projectId = currentProject.id as string;
     } else if (!provider || !llmApiKey || !modelName) {
         return { status: 400, error: 'Missing required credentials. Please provide Notaify API credentials or LLM configuration.' };
     }
@@ -43,32 +40,23 @@ export async function processTrialLlm(body: any) {
 
         // We use generateErrorAnalysis directly, bypassing email sending
         const { generateErrorAnalysis } = await import('@/lib/controllerHelper/LLMgenerator');
-        const analysis = await generateErrorAnalysis(provider, llmApiKey, modelName, selectedError);
+        const analysis = await generateErrorAnalysis(provider as "openai" | "claude" | "google", llmApiKey, modelName, selectedError);
 
         let savedLogId = null;
 
         // Save the trial error log if we know the project
-        if (body.apiKeyId && body.apiKey) {
-            const currentProject = await prisma.project.findFirst({
-                where: {
-                    notaifyApiKeyId: body.apiKeyId,
-                    notaifyApiKey: body.apiKey,
+        if (projectId) {
+            const newLog = await prisma.errorLog.create({
+                data: {
+                    projectId: projectId,
+                    error: selectedError,
+                    LLmType: provider as "openai" | "claude" | "google",
+                    llmApiModel: modelName,
+                    resolution: JSON.stringify(analysis),
+                    isTrial: true,
                 },
             });
-
-            if (currentProject) {
-                const newLog = await prisma.errorLog.create({
-                    data: {
-                        projectId: currentProject.id,
-                        error: selectedError,
-                        LLmType: provider as "openai" | "claude" | "google",
-                        llmApiModel: modelName,
-                        resolution: JSON.stringify(analysis),
-                        isTrial: true,
-                    },
-                });
-                savedLogId = newLog.id;
-            }
+            savedLogId = newLog.id;
         }
 
         return {
@@ -78,17 +66,17 @@ export async function processTrialLlm(body: any) {
             analysis: analysis,
             logId: savedLogId
         };
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Trial LLM error:', error);
         let errorMsg = 'Failed to analyze error using the LLM API.';
-        if (error.message) {
+        if (error instanceof Error) {
             errorMsg = error.message;
         }
         return { status: 500, error: errorMsg };
     }
 }
 
-export async function processTrialMail(body: any) {
+export async function processTrialMail(body: Record<string, string>) {
     let smtpUser: string;
     let smtpPass: string;
     let emailTo: string;
@@ -99,12 +87,7 @@ export async function processTrialMail(body: any) {
         smtpPass = body.smtpPass;
         emailTo = body.emailTo;
     } else if (body.apiKeyId && body.apiKey) {
-        const currentProject = await prisma.project.findFirst({
-            where: {
-                notaifyApiKeyId: body.apiKeyId,
-                notaifyApiKey: body.apiKey,
-            },
-        });
+        const currentProject = await findProjectByApiCredentials(body.apiKeyId, body.apiKey);
 
         if (!currentProject) {
             return { status: 404, error: 'Project not found or invalid credentials' };
@@ -114,9 +97,9 @@ export async function processTrialMail(body: any) {
             return { status: 400, error: 'Project is missing SMTP configuration. Please set SMTP User, SMTP Password, and Email To.' };
         }
 
-        smtpUser = currentProject.smtpUser;
-        smtpPass = currentProject.smtpPass;
-        emailTo = currentProject.emailTo;
+        smtpUser = currentProject.smtpUser as string;
+        smtpPass = currentProject.smtpPass as string;
+        emailTo = currentProject.emailTo as string;
     } else {
         return { status: 400, error: 'Please provide SMTP credentials or Notaify API credentials.' };
     }
@@ -201,7 +184,7 @@ export async function processTrialMail(body: any) {
             success: true,
             data: `Test email sent successfully to ${emailTo}`,
         };
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Trial mail error:', error);
         let errorMessage = 'Failed to send test email.';
         if (error instanceof Error) {

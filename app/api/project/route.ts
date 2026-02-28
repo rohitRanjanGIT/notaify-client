@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma/prisma';
+import { encryptIfPresent, decryptProjectSecrets } from '@/lib/utils/encryption';
 
 // GET - Fetch all projects for a user
 export async function GET(request: NextRequest) {
@@ -19,7 +20,12 @@ export async function GET(request: NextRequest) {
             orderBy: { createdAt: 'desc' },
         });
 
-        return NextResponse.json({ projects }, { status: 200 });
+        // Decrypt sensitive fields before sending to the client
+        const decryptedProjects = projects.map((p) =>
+            decryptProjectSecrets(p as unknown as Record<string, unknown>)
+        );
+
+        return NextResponse.json({ projects: decryptedProjects }, { status: 200 });
     } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         console.error('Failed to fetch projects:', error);
@@ -63,12 +69,12 @@ export async function POST(request: NextRequest) {
                 description: description || '',
                 projectName,
                 llmType: llmType || null,
-                llmApiKey: llmApiKey || null,
+                llmApiKey: encryptIfPresent(llmApiKey) || null,
                 llmApiModel: llmApiModel || null,
                 smtpUser: smtpUser || null,
-                smtpPass: smtpPass || null,
+                smtpPass: encryptIfPresent(smtpPass) || null,
                 emailTo: emailTo || null,
-                notaifyApiKey: notaifyApiKey || null,
+                notaifyApiKey: encryptIfPresent(notaifyApiKey) || null,
                 notaifyApiKeyId: notaifyApiKeyId || null,
             },
         });
@@ -117,12 +123,12 @@ export async function PUT(request: NextRequest) {
                 description,
                 projectName,
                 llmType: llmType || null,
-                llmApiKey: llmApiKey || null,
+                llmApiKey: encryptIfPresent(llmApiKey) || null,
                 llmApiModel: llmApiModel || null,
                 smtpUser: smtpUser || null,
-                smtpPass: smtpPass || null,
+                smtpPass: encryptIfPresent(smtpPass) || null,
                 emailTo: emailTo || null,
-                notaifyApiKey: notaifyApiKey || null,
+                notaifyApiKey: encryptIfPresent(notaifyApiKey) || null,
                 notaifyApiKeyId: notaifyApiKeyId || null,
             },
         });

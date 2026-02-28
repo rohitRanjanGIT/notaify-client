@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma/prisma';
 import nodemailer from 'nodemailer';
+import { findProjectByApiCredentials } from '@/lib/utils/encryption';
 
 /**
  * Ingest Endpoint (/api/package/nodexp/ingest)
@@ -31,13 +32,8 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // 1. Authenticate & fetch the project configurations
-        const currentProject = await prisma.project.findFirst({
-            where: {
-                notaifyApiKeyId: apiKeyId,
-                notaifyApiKey: apiKey,
-            },
-        });
+        // 1. Authenticate & fetch the project configurations (with decrypted secrets)
+        const currentProject = await findProjectByApiCredentials(apiKeyId, apiKey);
 
         if (!currentProject) {
             return NextResponse.json(
@@ -54,9 +50,9 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        const provider = currentProject.llmType;
-        const llmApiKey = currentProject.llmApiKey;
-        const modelName = currentProject.llmApiModel;
+        const provider = currentProject.llmType as string;
+        const llmApiKey = currentProject.llmApiKey as string;
+        const modelName = currentProject.llmApiModel as string;
 
         // Ensure we capture as much context as possible for the LLM
         const fullErrorContext = `${errorMsg}\nLocation: ${location || 'Unknown'}\nStack: ${stack || 'No Stack'}`;
@@ -66,7 +62,7 @@ export async function POST(request: NextRequest) {
 
         let analysis;
         try {
-            analysis = await generateErrorAnalysis(provider, llmApiKey, modelName, fullErrorContext);
+            analysis = await generateErrorAnalysis(provider as "openai" | "claude" | "google", llmApiKey, modelName, fullErrorContext);
         } catch (llmError: any) {
             console.error('LLM Analysis failed during ingestion:', llmError);
 
@@ -83,9 +79,9 @@ export async function POST(request: NextRequest) {
         // 3. Save the Error and its Analysis into the Database
         const newLog = await prisma.errorLog.create({
             data: {
-                projectId: currentProject.id,
+                projectId: currentProject.id as string,
                 error: fullErrorContext.substring(0, 1000), // Prevent overly long strings
-                LLmType: provider,
+                LLmType: provider as "openai" | "claude" | "google",
                 llmApiModel: modelName,
                 resolution: JSON.stringify(analysis),
                 isTrial: false, // This is a real ingested error
@@ -101,8 +97,8 @@ export async function POST(request: NextRequest) {
                     port: 587,
                     secure: false,
                     auth: {
-                        user: currentProject.smtpUser,
-                        pass: currentProject.smtpPass,
+                        user: currentProject.smtpUser as string,
+                        pass: currentProject.smtpPass as string,
                     },
                     connectionTimeout: 5000,
                     greetingTimeout: 5000,
@@ -181,9 +177,9 @@ export async function POST(request: NextRequest) {
                 `;
 
                 await transporter.sendMail({
-                    from: `Notaify Alerts <${currentProject.smtpUser}>`,
-                    to: currentProject.emailTo,
-                    subject: `🚨 Notaify Alert: Error in ${currentProject.projectName}`,
+                    from: `Notaify Alerts <${currentProject.smtpUser as string}>`,
+                    to: currentProject.emailTo as string,
+                    subject: `🚨 Notaify Alert: Error in ${currentProject.projectName as string}`,
                     html: emailHtml,
                 });
             } catch (mailError) {
