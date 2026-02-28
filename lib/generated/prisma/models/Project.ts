@@ -262,6 +262,7 @@ export type ProjectWhereInput = {
   notaifyApiKeyId?: Prisma.StringNullableFilter<"Project"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Project"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Project"> | Date | string
+  errorLogs?: Prisma.ErrorLogListRelationFilter
 }
 
 export type ProjectOrderByWithRelationInput = {
@@ -280,6 +281,7 @@ export type ProjectOrderByWithRelationInput = {
   notaifyApiKeyId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  errorLogs?: Prisma.errorLogOrderByRelationAggregateInput
 }
 
 export type ProjectWhereUniqueInput = Prisma.AtLeast<{
@@ -301,6 +303,7 @@ export type ProjectWhereUniqueInput = Prisma.AtLeast<{
   notaifyApiKeyId?: Prisma.StringNullableFilter<"Project"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Project"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Project"> | Date | string
+  errorLogs?: Prisma.ErrorLogListRelationFilter
 }, "id">
 
 export type ProjectOrderByWithAggregationInput = {
@@ -361,6 +364,7 @@ export type ProjectCreateInput = {
   notaifyApiKeyId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  errorLogs?: Prisma.errorLogCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateInput = {
@@ -379,6 +383,7 @@ export type ProjectUncheckedCreateInput = {
   notaifyApiKeyId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  errorLogs?: Prisma.errorLogUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUpdateInput = {
@@ -397,6 +402,7 @@ export type ProjectUpdateInput = {
   notaifyApiKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  errorLogs?: Prisma.errorLogUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateInput = {
@@ -415,6 +421,7 @@ export type ProjectUncheckedUpdateInput = {
   notaifyApiKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  errorLogs?: Prisma.errorLogUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateManyInput = {
@@ -525,6 +532,11 @@ export type ProjectMinOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
 }
 
+export type ProjectScalarRelationFilter = {
+  is?: Prisma.ProjectWhereInput
+  isNot?: Prisma.ProjectWhereInput
+}
+
 export type StringFieldUpdateOperationsInput = {
   set?: string
 }
@@ -541,6 +553,137 @@ export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
 }
 
+export type ProjectCreateNestedOneWithoutErrorLogsInput = {
+  create?: Prisma.XOR<Prisma.ProjectCreateWithoutErrorLogsInput, Prisma.ProjectUncheckedCreateWithoutErrorLogsInput>
+  connectOrCreate?: Prisma.ProjectCreateOrConnectWithoutErrorLogsInput
+  connect?: Prisma.ProjectWhereUniqueInput
+}
+
+export type ProjectUpdateOneRequiredWithoutErrorLogsNestedInput = {
+  create?: Prisma.XOR<Prisma.ProjectCreateWithoutErrorLogsInput, Prisma.ProjectUncheckedCreateWithoutErrorLogsInput>
+  connectOrCreate?: Prisma.ProjectCreateOrConnectWithoutErrorLogsInput
+  upsert?: Prisma.ProjectUpsertWithoutErrorLogsInput
+  connect?: Prisma.ProjectWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProjectUpdateToOneWithWhereWithoutErrorLogsInput, Prisma.ProjectUpdateWithoutErrorLogsInput>, Prisma.ProjectUncheckedUpdateWithoutErrorLogsInput>
+}
+
+export type ProjectCreateWithoutErrorLogsInput = {
+  id?: string
+  user_id: string
+  name: string
+  description: string
+  projectName: string
+  llmType?: $Enums.LlmType | null
+  llmApiKey?: string | null
+  llmApiModel?: string | null
+  smtpUser?: string | null
+  smtpPass?: string | null
+  emailTo?: string | null
+  notaifyApiKey?: string | null
+  notaifyApiKeyId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type ProjectUncheckedCreateWithoutErrorLogsInput = {
+  id?: string
+  user_id: string
+  name: string
+  description: string
+  projectName: string
+  llmType?: $Enums.LlmType | null
+  llmApiKey?: string | null
+  llmApiModel?: string | null
+  smtpUser?: string | null
+  smtpPass?: string | null
+  emailTo?: string | null
+  notaifyApiKey?: string | null
+  notaifyApiKeyId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type ProjectCreateOrConnectWithoutErrorLogsInput = {
+  where: Prisma.ProjectWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProjectCreateWithoutErrorLogsInput, Prisma.ProjectUncheckedCreateWithoutErrorLogsInput>
+}
+
+export type ProjectUpsertWithoutErrorLogsInput = {
+  update: Prisma.XOR<Prisma.ProjectUpdateWithoutErrorLogsInput, Prisma.ProjectUncheckedUpdateWithoutErrorLogsInput>
+  create: Prisma.XOR<Prisma.ProjectCreateWithoutErrorLogsInput, Prisma.ProjectUncheckedCreateWithoutErrorLogsInput>
+  where?: Prisma.ProjectWhereInput
+}
+
+export type ProjectUpdateToOneWithWhereWithoutErrorLogsInput = {
+  where?: Prisma.ProjectWhereInput
+  data: Prisma.XOR<Prisma.ProjectUpdateWithoutErrorLogsInput, Prisma.ProjectUncheckedUpdateWithoutErrorLogsInput>
+}
+
+export type ProjectUpdateWithoutErrorLogsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  user_id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  projectName?: Prisma.StringFieldUpdateOperationsInput | string
+  llmType?: Prisma.NullableEnumLlmTypeFieldUpdateOperationsInput | $Enums.LlmType | null
+  llmApiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  llmApiModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  smtpUser?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  smtpPass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notaifyApiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notaifyApiKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type ProjectUncheckedUpdateWithoutErrorLogsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  user_id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  projectName?: Prisma.StringFieldUpdateOperationsInput | string
+  llmType?: Prisma.NullableEnumLlmTypeFieldUpdateOperationsInput | $Enums.LlmType | null
+  llmApiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  llmApiModel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  smtpUser?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  smtpPass?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notaifyApiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notaifyApiKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+
+/**
+ * Count Type ProjectCountOutputType
+ */
+
+export type ProjectCountOutputType = {
+  errorLogs: number
+}
+
+export type ProjectCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  errorLogs?: boolean | ProjectCountOutputTypeCountErrorLogsArgs
+}
+
+/**
+ * ProjectCountOutputType without action
+ */
+export type ProjectCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ProjectCountOutputType
+   */
+  select?: Prisma.ProjectCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * ProjectCountOutputType without action
+ */
+export type ProjectCountOutputTypeCountErrorLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.errorLogWhereInput
+}
 
 
 export type ProjectSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -559,6 +702,8 @@ export type ProjectSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   notaifyApiKeyId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  errorLogs?: boolean | Prisma.Project$errorLogsArgs<ExtArgs>
+  _count?: boolean | Prisma.ProjectCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["project"]>
 
 export type ProjectSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -616,10 +761,18 @@ export type ProjectSelectScalar = {
 }
 
 export type ProjectOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "user_id" | "name" | "description" | "projectName" | "llmType" | "llmApiKey" | "llmApiModel" | "smtpUser" | "smtpPass" | "emailTo" | "notaifyApiKey" | "notaifyApiKeyId" | "createdAt" | "updatedAt", ExtArgs["result"]["project"]>
+export type ProjectInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  errorLogs?: boolean | Prisma.Project$errorLogsArgs<ExtArgs>
+  _count?: boolean | Prisma.ProjectCountOutputTypeDefaultArgs<ExtArgs>
+}
+export type ProjectIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type ProjectIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
 
 export type $ProjectPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Project"
-  objects: {}
+  objects: {
+    errorLogs: Prisma.$errorLogPayload<ExtArgs>[]
+  }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     user_id: string
@@ -1030,6 +1183,7 @@ readonly fields: ProjectFieldRefs;
  */
 export interface Prisma__ProjectClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  errorLogs<T extends Prisma.Project$errorLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$errorLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$errorLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1091,6 +1245,10 @@ export type ProjectFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Inter
    */
   omit?: Prisma.ProjectOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectInclude<ExtArgs> | null
+  /**
    * Filter, which Project to fetch.
    */
   where: Prisma.ProjectWhereUniqueInput
@@ -1109,6 +1267,10 @@ export type ProjectFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extension
    */
   omit?: Prisma.ProjectOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectInclude<ExtArgs> | null
+  /**
    * Filter, which Project to fetch.
    */
   where: Prisma.ProjectWhereUniqueInput
@@ -1126,6 +1288,10 @@ export type ProjectFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Omit specific fields from the Project
    */
   omit?: Prisma.ProjectOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectInclude<ExtArgs> | null
   /**
    * Filter, which Project to fetch.
    */
@@ -1175,6 +1341,10 @@ export type ProjectFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions
    */
   omit?: Prisma.ProjectOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectInclude<ExtArgs> | null
+  /**
    * Filter, which Project to fetch.
    */
   where?: Prisma.ProjectWhereInput
@@ -1223,6 +1393,10 @@ export type ProjectFindManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
    */
   omit?: Prisma.ProjectOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectInclude<ExtArgs> | null
+  /**
    * Filter, which Projects to fetch.
    */
   where?: Prisma.ProjectWhereInput
@@ -1265,6 +1439,10 @@ export type ProjectCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Omit specific fields from the Project
    */
   omit?: Prisma.ProjectOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectInclude<ExtArgs> | null
   /**
    * The data needed to create a Project.
    */
@@ -1313,6 +1491,10 @@ export type ProjectUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Omit specific fields from the Project
    */
   omit?: Prisma.ProjectOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectInclude<ExtArgs> | null
   /**
    * The data needed to update a Project.
    */
@@ -1380,6 +1562,10 @@ export type ProjectUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    */
   omit?: Prisma.ProjectOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectInclude<ExtArgs> | null
+  /**
    * The filter to search for the Project to update in case it exists.
    */
   where: Prisma.ProjectWhereUniqueInput
@@ -1406,6 +1592,10 @@ export type ProjectDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    */
   omit?: Prisma.ProjectOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectInclude<ExtArgs> | null
+  /**
    * Filter which Project to delete.
    */
   where: Prisma.ProjectWhereUniqueInput
@@ -1426,6 +1616,30 @@ export type ProjectDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
 }
 
 /**
+ * Project.errorLogs
+ */
+export type Project$errorLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the errorLog
+   */
+  select?: Prisma.errorLogSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the errorLog
+   */
+  omit?: Prisma.errorLogOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.errorLogInclude<ExtArgs> | null
+  where?: Prisma.errorLogWhereInput
+  orderBy?: Prisma.errorLogOrderByWithRelationInput | Prisma.errorLogOrderByWithRelationInput[]
+  cursor?: Prisma.errorLogWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ErrorLogScalarFieldEnum | Prisma.ErrorLogScalarFieldEnum[]
+}
+
+/**
  * Project without action
  */
 export type ProjectDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1437,4 +1651,8 @@ export type ProjectDefaultArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Omit specific fields from the Project
    */
   omit?: Prisma.ProjectOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProjectInclude<ExtArgs> | null
 }

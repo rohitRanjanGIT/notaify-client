@@ -47,9 +47,23 @@ Respond only with valid JSON.`;
         throw new Error(`Unsupported provider: ${provider}`);
     }
 
-    // Clean up markdown markers if the LLM wraps the JSON
+    // Robust string cleanup and JSON extraction
     response = response.replace(/```json/g, '').replace(/```/g, '').trim();
-    return JSON.parse(response);
+
+    // Attempt to extract from the first { to the last }
+    const startIndex = response.indexOf('{');
+    const endIndex = response.lastIndexOf('}');
+
+    let jsonStr = response;
+    if (startIndex !== -1 && endIndex !== -1 && endIndex >= startIndex) {
+        jsonStr = response.substring(startIndex, endIndex + 1);
+    }
+
+    try {
+        return JSON.parse(jsonStr);
+    } catch (parseError: any) {
+        throw new Error(`Failed to parse LLM response as JSON. Response was: ${response.substring(0, 100)}...`);
+    }
 }
 
 // Function to test the LLM config and send the result via email

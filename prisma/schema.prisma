@@ -7,33 +7,23 @@ datasource db {
   provider = "postgresql"
 }
 
-enum LlmType {
-  openai
-  claude
-  google
-}
-
 model Project {
-  id          String @id @default(uuid())
-  user_id     String
-  name        String
-  description String
-
-  // project config
-  projectName String
-  llmType     LlmType?
-  llmApiKey   String?
-  llmApiModel String?
-
-  smtpUser String?
-  smtpPass String?
-  emailTo  String?
-
+  id              String     @id @default(uuid())
+  user_id         String
+  name            String
+  description     String
+  projectName     String
+  llmType         LlmType?
+  llmApiKey       String?
+  llmApiModel     String?
+  smtpUser        String?
+  smtpPass        String?
+  emailTo         String?
   notaifyApiKey   String?
   notaifyApiKeyId String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  errorLogs       errorLog[]
 
   @@map("projects")
 }
@@ -43,9 +33,17 @@ model errorLog {
   projectId   String
   error       String
   LLmType     LlmType
+  timestamp   DateTime @default(now())
   llmApiModel String?
   resolution  String?
-  timestamp   DateTime @default(now())
+  isTrial     Boolean  @default(false)
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@map("error_logs")
+}
+
+enum LlmType {
+  openai
+  claude
+  google
 }

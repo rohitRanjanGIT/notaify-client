@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { testLlmConfigAndSendEmail } from '@/lib/controllerHelper/LLMgenerator';
-import { prisma } from '@/lib/prisma/prisma';
+import { processTrialLlm } from '@/lib/controllerHelper/trialHelper';
 
 /**
  * Handles LLM verification requests.
@@ -10,75 +9,25 @@ import { prisma } from '@/lib/prisma/prisma';
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
+        const result = await processTrialLlm(body);
 
-        let provider = body.provider;
-        let apiKey = body.apiKey;
-        let modelName = body.modelName;
-        let smtpUser = body.smtpUser;
-        let smtpPass = body.smtpPass;
-        let emailTo = body.emailTo;
-
-        // Support fetching config from DB via project_id
-        if (body.project_id) {
-            const currentProject = await prisma.project.findUnique({
-                where: { id: body.project_id },
-            });
-
-            if (!currentProject) {
-                return NextResponse.json({ message: 'error', error: 'Project not found' }, { status: 404 });
-            }
-
-            if (!currentProject.llmType || !currentProject.llmApiKey || !currentProject.llmApiModel) {
-                return NextResponse.json(
-                    { message: 'error', error: 'Project is missing LLM configuration.' },
-                    { status: 400 }
-                );
-            }
-
-            if (!currentProject.smtpUser || !currentProject.smtpPass || !currentProject.emailTo) {
-                return NextResponse.json(
-                    { message: 'error', error: 'Project is missing SMTP configuration. We need SMTP to email you the analysis.' },
-                    { status: 400 }
-                );
-            }
-
-            provider = currentProject.llmType;
-            apiKey = currentProject.llmApiKey;
-            modelName = currentProject.llmApiModel;
-            smtpUser = currentProject.smtpUser;
-            smtpPass = currentProject.smtpPass;
-            emailTo = currentProject.emailTo;
-        } else if (!provider || !apiKey || !modelName || !smtpUser || !smtpPass || !emailTo) {
+        if (result.error) {
             return NextResponse.json(
-                { message: 'error', error: 'Missing required fields. Please fill in both LLM and SMTP credentials to test.' },
-                { status: 400 }
+                { message: 'error', error: result.error },
+                { status: result.status }
             );
         }
 
-        const result = await testLlmConfigAndSendEmail(
-            provider,
-            apiKey,
-            modelName,
-            smtpUser,
-            smtpPass,
-            emailTo
-        );
-
         return NextResponse.json({
             message: 'success',
-            data: `LLM verification successful! The resolved analysis has been emailed to ${emailTo}.`,
+            data: result.data,
             analysis: result.analysis
-        });
+        }, { status: result.status || 200 });
+
     } catch (error: any) {
-        console.error('Trial LLM error:', error);
-
-        let errorMsg = 'Failed to analyze error using the LLM API.';
-        if (error.message) {
-            errorMsg = error.message;
-        }
-
+        console.error('Trial LLM route error:', error);
         return NextResponse.json(
-            { message: 'error', error: errorMsg },
+            { message: 'error', error: error.message || 'Internal Server Error' },
             { status: 500 }
         );
     }

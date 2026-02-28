@@ -19,6 +19,7 @@ import {
   Loader2,
   CheckCircle2,
   FlaskConical,
+  BookOpenText,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -131,43 +132,79 @@ export default function DashboardPage() {
     setError(null);
     setSuccess(null);
 
+    const project = projects.find(p => p.project_id === projectId);
+    if (!project) {
+      setError("Project not found.");
+      setTestingConfigId(null);
+      return;
+    }
+
+    const apiKeyId = project.notaifyApiKeyId;
+    const apiKey = project.notaifyApiKey;
+
+    if (!apiKeyId || !apiKey) {
+      setError("Notaify API credentials (Key and ID) are required to test configurations. Please generate an API Key first.");
+      setTestingConfigId(null);
+      return;
+    }
+
     try {
       if (hasLlm) {
-        // Run both tests if LLM is configured (since LLM needs Mail to send results anyway)
+        // Run both tests if LLM is configured
         const [mailRes, llmRes] = await Promise.allSettled([
           fetch('/api/package/nodexp/trialMail', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ project_id: projectId }),
+            body: JSON.stringify({ apiKeyId, apiKey }),
           }),
           fetch('/api/package/nodexp/trialLlm', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ project_id: projectId }),
+            body: JSON.stringify({ apiKeyId, apiKey }),
           })
         ]);
 
         let allSuccess = true;
         let messages = [];
 
-        if (mailRes.status === 'fulfilled' && mailRes.value.ok) {
-          messages.push('SMTP Test Email Sent');
+        if (mailRes.status === 'fulfilled') {
+          if (mailRes.value.ok) {
+            messages.push('SMTP Test Email Sent');
+          } else {
+            allSuccess = false;
+            try {
+              const data = await mailRes.value.json();
+              messages.push(`SMTP Test Failed: ${data.error || 'Unknown error'}`);
+            } catch {
+              messages.push('SMTP Test Failed');
+            }
+          }
         } else {
           allSuccess = false;
-          messages.push('SMTP Test Failed');
+          messages.push('SMTP Request Failed');
         }
 
-        if (llmRes.status === 'fulfilled' && llmRes.value.ok) {
-          messages.push('LLM Integration Successful');
+        if (llmRes.status === 'fulfilled') {
+          if (llmRes.value.ok) {
+            messages.push('LLM Integration Successful');
+          } else {
+            allSuccess = false;
+            try {
+              const data = await llmRes.value.json();
+              messages.push(`LLM Test Failed: ${data.error || 'Unknown error'}`);
+            } catch {
+              messages.push('LLM Test Failed');
+            }
+          }
         } else {
           allSuccess = false;
-          messages.push('LLM Test Failed');
+          messages.push('LLM Request Failed');
         }
 
         if (allSuccess) {
           setSuccess('All Configurations Verified: ' + messages.join(' & ') + '!');
         } else {
-          setError('Some tests failed: ' + messages.join(', '));
+          setError('Some tests failed: ' + messages.join(' | '));
         }
 
       } else {
@@ -175,7 +212,7 @@ export default function DashboardPage() {
         const response = await fetch('/api/package/nodexp/trialMail', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ project_id: projectId }),
+          body: JSON.stringify({ apiKeyId, apiKey }),
         });
         const data = await response.json();
 
@@ -469,6 +506,23 @@ export default function DashboardPage() {
                                   <TooltipContent side="bottom"><p>Test LLM & Mail</p></TooltipContent>
                                 </Tooltip>
                               )}
+
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-7 w-7 text-green-600 hover:text-green-700 hover:bg-green-50 dark:text-green-500 dark:hover:text-green-400 dark:hover:bg-green-950/30"
+                                    asChild
+                                  >
+                                    <Link href={`/dashboard/logs?projectId=${project.project_id}`}>
+                                      <BookOpenText className="h-3.5 w-3.5" />
+                                      <span className="sr-only">View Logs</span>
+                                    </Link>
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent side="bottom"><p>View Logs</p></TooltipContent>
+                              </Tooltip>
 
                               <div className="w-px h-4 bg-border mx-1 hidden sm:block"></div>
 

@@ -97,9 +97,10 @@ export const ErrorLogScalarFieldEnum = {
   projectId: 'projectId',
   error: 'error',
   LLmType: 'LLmType',
+  timestamp: 'timestamp',
   llmApiModel: 'llmApiModel',
   resolution: 'resolution',
-  timestamp: 'timestamp'
+  isTrial: 'isTrial'
 } as const
 
 export type ErrorLogScalarFieldEnum = (typeof ErrorLogScalarFieldEnum)[keyof typeof ErrorLogScalarFieldEnum]

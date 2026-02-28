@@ -458,9 +458,6 @@ export default function AddProjectPage() {
     if (!formData.llmType || !formData.llmApiKey || !formData.llmApiModel) {
       initialLlmState = { type: 'error', message: 'Missing required LLM API fields (Provider, Key, Model).' };
       hasError = true;
-    } else if (hasError && initialLlmState.type !== 'error') {
-      // If LLM is fine but SMTP failed, LLM would fail too (it needs SMTP)
-      initialLlmState = { type: 'error', message: 'LLM config requires valid SMTP credentials to test.' };
     }
 
     setTestResult({ smtp: initialSmtpState, llm: initialLlmState });
@@ -490,11 +487,8 @@ export default function AddProjectPage() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             provider: formData.llmType,
-            apiKey: formData.llmApiKey,
+            llmApiKey: formData.llmApiKey,
             modelName: formData.llmApiModel,
-            smtpUser: formData.smtpUser,
-            smtpPass: formData.smtpPass,
-            emailTo: formData.emailTo,
           }),
         })
       ]);

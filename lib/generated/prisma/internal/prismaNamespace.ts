@@ -618,9 +618,10 @@ export const ErrorLogScalarFieldEnum = {
   projectId: 'projectId',
   error: 'error',
   LLmType: 'LLmType',
+  timestamp: 'timestamp',
   llmApiModel: 'llmApiModel',
   resolution: 'resolution',
-  timestamp: 'timestamp'
+  isTrial: 'isTrial'
 } as const
 
 export type ErrorLogScalarFieldEnum = (typeof ErrorLogScalarFieldEnum)[keyof typeof ErrorLogScalarFieldEnum]
@@ -695,6 +696,13 @@ export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel
  * Reference to a field of type 'DateTime[]'
  */
 export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Boolean'
+ */
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 
