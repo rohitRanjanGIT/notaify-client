@@ -12,12 +12,12 @@ export default function Footer() {
                             <div className="relative h-8 w-8 overflow-hidden rounded-md">
                                 <Image
                                     src="/notaiy_logo.png"
-                                    alt="Notaifi Logo"
+                                    alt="Notaify Logo"
                                     fill
                                     className="object-cover"
                                 />
                             </div>
-                            Notaifi
+                            Notaify
                         </Link>
                         <p className="text-sm text-gray-600 dark:text-gray-400 max-w-xs leading-relaxed">
                             AI-powered error monitoring and notification system for modern backend applications. Capture, analyze, and fix issues faster.
@@ -38,7 +38,7 @@ export default function Footer() {
                             <a href="https://www.npmjs.com/package/notaify" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50">
                                 <span className="sr-only">NPM</span>
                                 <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                    <path d="M0 7.334v8h6.666v1.332H12v-1.332h12v-8H0zm6.666 6.664H5.334v-4H3.999v4H1.335V8.667h5.331v5.331zm4 0v1.336H8.001V8.667h5.334v5.332h-2.669v-.001zm12.001 0h-1.33v-4h-1.336v4h-1.335v-4h-1.33v4h-2.671V8.667h8.002v5.331zM10.665 10H12v2.667h-1.335V10z"/>
+                                    <path d="M0 7.334v8h6.666v1.332H12v-1.332h12v-8H0zm6.666 6.664H5.334v-4H3.999v4H1.335V8.667h5.331v5.331zm4 0v1.336H8.001V8.667h5.334v5.332h-2.669v-.001zm12.001 0h-1.33v-4h-1.336v4h-1.335v-4h-1.33v4h-2.671V8.667h8.002v5.331zM10.665 10H12v2.667h-1.335V10z" />
                                 </svg>
                             </a>
                         </div>
@@ -55,9 +55,6 @@ export default function Footer() {
                                     </li>
                                     <li>
                                         <Link href="/features" className="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50">Features</Link>
-                                    </li>
-                                    <li>
-                                        <Link href="/get-started" className="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50">Get Started</Link>
                                     </li>
                                 </ul>
                             </div>
@@ -108,7 +105,7 @@ export default function Footer() {
 
                 <div className="mt-12 border-t border-gray-200 pt-8 dark:border-gray-800">
                     <p className="text-center text-xs text-gray-500 dark:text-gray-400">
-                        &copy; {new Date().getFullYear()} Notaifi. All rights reserved.
+                        &copy; {new Date().getFullYear()} Notaify. All rights reserved.
                     </p>
                 </div>
             </div>

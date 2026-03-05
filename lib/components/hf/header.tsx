@@ -16,7 +16,7 @@ export default function Header() {
                         <div className="relative h-10 w-20  overflow-hidden rounded-md">
                             <Image
                                 src="/notaiy_logo.png"
-                                alt="Notaifi Logo"
+                                alt="Notaify Logo"
                                 fill
                                 className="object-cover"
                             />
@@ -28,9 +28,6 @@ export default function Header() {
                 <nav className="hidden md:flex items-center gap-8">
                     <Link href="/" className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50">
                         Home
-                    </Link>
-                    <Link href="/get-started" className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50">
-                        Get Started
                     </Link>
                     <Link href="/features" className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50">
                         Features

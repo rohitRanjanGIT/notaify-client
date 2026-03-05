@@ -1,55 +1,71 @@
+"use client";
+
+import { motion } from "framer-motion";
+
 export default function Features() {
+    const features = [
+        {
+            title: "Real-time AI Diagnosis",
+            description: "No more scrolling through infinite logs. Our integrated AI agents process the crash instantly and output a plain-English explanation of exactly what broke and how to solve it.",
+            icon: (
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456Z" />
+                </svg>
+            )
+        },
+        {
+            title: "Automatic Stack Trace Parsing",
+            description: "Errors are ingested directly from your V8 runtime, parsed out efficiently mapping line numbers, and formatted into beautiful tables that highlight the culprit files immediately.",
+            icon: (
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z" />
+                </svg>
+            )
+        },
+        {
+            title: "Native Email rendering",
+            description: "No need for external webhooks. Professional, detailed bug reports are beautifully crafted and pushed straight via SMTP to your engineering team's inbox directly.",
+            icon: (
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+                </svg>
+            )
+        }
+    ];
+
     return (
-        <section className="py-24 bg-white dark:bg-black">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="text-center max-w-2xl mx-auto mb-16">
-                    <h2 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl">
-                        Everything you need to debug faster
+        <section className="py-24 bg-white dark:bg-[#050505] relative border-t border-black/5 dark:border-white/5">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+                <div className="flex flex-col items-center text-center max-w-3xl mx-auto mb-20">
+                    <h2 className="text-3xl md:text-5xl font-extrabold tracking-tight text-zinc-900 dark:text-white">
+                        Designed for Developer Velocity
                     </h2>
-                    <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">
-                        Powerful features designed for modern engineering teams.
+                    <p className="mt-6 text-xl text-zinc-600 dark:text-zinc-400">
+                        Powerful features designed solely to shrink your mean-time-to-resolution to near zero.
                     </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {/* Feature 1 */}
-                    <div className="rounded-2xl border border-gray-200 bg-gray-50 p-8 transition-colors hover:border-gray-300 dark:border-gray-800 dark:bg-gray-900/50 dark:hover:border-gray-700">
-                        <div className="h-10 w-10 rounded-lg bg-blue-100 flex items-center justify-center dark:bg-blue-900/30">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 text-blue-600 dark:text-blue-400">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
-                            </svg>
-                        </div>
-                        <h3 className="mt-4 text-xl font-semibold text-gray-900 dark:text-white">Real-time Analysis</h3>
-                        <p className="mt-2 text-gray-600 dark:text-gray-400">
-                            Get instant insights into what went wrong. No more waiting for logs to ingest or digging through gigabytes of text.
-                        </p>
-                    </div>
-
-                    {/* Feature 2 */}
-                    <div className="rounded-2xl border border-gray-200 bg-gray-50 p-8 transition-colors hover:border-gray-300 dark:border-gray-800 dark:bg-gray-900/50 dark:hover:border-gray-700">
-                        <div className="h-10 w-10 rounded-lg bg-purple-100 flex items-center justify-center dark:bg-purple-900/30">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 text-purple-600 dark:text-purple-400">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z" />
-                            </svg>
-                        </div>
-                        <h3 className="mt-4 text-xl font-semibold text-gray-900 dark:text-white">AI-Powered Solutions</h3>
-                        <p className="mt-2 text-gray-600 dark:text-gray-400">
-                            Notaifi doesn't just tell you there's an error. our AI suggests the exact fix you need to resolve it.
-                        </p>
-                    </div>
-
-                    {/* Feature 3 */}
-                    <div className="rounded-2xl border border-gray-200 bg-gray-50 p-8 transition-colors hover:border-gray-300 dark:border-gray-800 dark:bg-gray-900/50 dark:hover:border-gray-700">
-                        <div className="h-10 w-10 rounded-lg bg-green-100 flex items-center justify-center dark:bg-green-900/30">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 text-green-600 dark:text-green-400">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418" />
-                            </svg>
-                        </div>
-                        <h3 className="mt-4 text-xl font-semibold text-gray-900 dark:text-white">Seamless Integrations</h3>
-                        <p className="mt-2 text-gray-600 dark:text-gray-400">
-                            Works with your favorite tools. Send alerts to Slack, Discord, Microsoft Teams, or Jira with a single click.
-                        </p>
-                    </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
+                    {features.map((feature, idx) => (
+                        <motion.div
+                            key={idx}
+                            initial={{ opacity: 0, y: 30 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.5, delay: idx * 0.1 }}
+                            className="flex flex-col items-center text-center group"
+                        >
+                            <div className="h-16 w-16 mb-8 rounded-2xl bg-zinc-100 text-zinc-900 shadow-sm flex items-center justify-center border border-black/5 dark:bg-zinc-900 dark:text-white dark:border-white/10 transition-all duration-300 group-hover:scale-110 group-hover:shadow-md group-hover:-translate-y-2">
+                                {feature.icon}
+                            </div>
+                            <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-4">
+                                {feature.title}
+                            </h3>
+                            <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed max-w-sm">
+                                {feature.description}
+                            </p>
+                        </motion.div>
+                    ))}
                 </div>
             </div>
         </section>
