@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@clerk/nextjs';
 import { ProjectConfig } from '@/lib/types/types';
@@ -71,7 +71,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 
-export default function AddProjectPage() {
+function AddProjectContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { userId } = useAuth();
@@ -1165,5 +1165,13 @@ export default function AddProjectPage() {
         </div>
       </main>
     </TooltipProvider>
+  );
+}
+
+export default function AddProjectPage() {
+  return (
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center"><span className="text-muted-foreground">Loading...</span></div>}>
+      <AddProjectContent />
+    </Suspense>
   );
 }

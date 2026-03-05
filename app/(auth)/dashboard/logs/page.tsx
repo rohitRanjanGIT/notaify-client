@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@clerk/nextjs';
 import Link from 'next/link';
@@ -59,7 +59,7 @@ interface ParsedResolution {
     errorType?: string;
 }
 
-export default function LogsPage() {
+function LogsContent() {
     const searchParams = useSearchParams();
     const projectId = searchParams.get('projectId');
 
@@ -348,5 +348,13 @@ export default function LogsPage() {
                 )}
             </div>
         </main>
+    );
+}
+
+export default function LogsPage() {
+    return (
+        <Suspense fallback={<div className="flex min-h-screen items-center justify-center"><span className="text-muted-foreground">Loading...</span></div>}>
+            <LogsContent />
+        </Suspense>
     );
 }
