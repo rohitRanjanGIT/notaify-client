@@ -15,9 +15,6 @@ export default function LoginPage() {
 
           <div className="relative flex h-full items-center justify-center px-12 py-12 text-center">
             <div className="max-w-md space-y-6">
-              {/* Logo placeholder */}
-              <div className="mx-auto h-12 w-12 rounded-xl border border-emerald-400/40 bg-emerald-400/10" />
-
               <h1 className="text-3xl font-semibold leading-tight">
                 Catch errors.
                 <br />

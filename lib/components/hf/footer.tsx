@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 
 export default function Footer() {
     return (
@@ -8,15 +7,7 @@ export default function Footer() {
                 <div className="xl:grid xl:grid-cols-3 xl:gap-8">
                     {/* Brand Section */}
                     <div className="space-y-4">
-                        <Link href="/" className="flex items-center gap-2 font-bold text-xl tracking-tighter text-gray-900 dark:text-white">
-                            <div className="relative h-8 w-8 overflow-hidden rounded-md">
-                                <Image
-                                    src="/notaiy_logo.png"
-                                    alt="Notaify Logo"
-                                    fill
-                                    className="object-cover"
-                                />
-                            </div>
+                        <Link href="/" className="font-bold text-xl tracking-tighter text-gray-900 dark:text-white">
                             Notaify
                         </Link>
                         <p className="text-sm text-gray-600 dark:text-gray-400 max-w-xs leading-relaxed">
