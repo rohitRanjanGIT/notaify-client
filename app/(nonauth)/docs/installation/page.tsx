@@ -35,7 +35,7 @@ export default function InstallationPage() {
                 <div className="not-prose mt-4">
                     <CodeBlock
                         language="env"
-                        code={`NOTAIFY_API_KEY=your_api_key\nNOTAIFY_PASSWORD=your_password`}
+                        code={`NOTAIFY_API_KEY_ID=your_api_key_id\nNOTAIFY_API_KEY=your_api_key`}
                     />
                 </div>
             </div>
@@ -46,7 +46,7 @@ export default function InstallationPage() {
                     <h3 className="text-lg font-semibold text-amber-900 dark:text-amber-300">Where do I get my credentials?</h3>
                 </div>
                 <p className="mt-2 text-sm text-amber-800 dark:text-amber-400">
-                    You can get your API key and password directly from your <Link href="/dashboard" className="font-medium underline underline-offset-4 hover:text-amber-900 dark:hover:text-amber-200">Notaify Dashboard</Link> after creating a project.
+                    You can get your API Key ID and API Key directly from your <Link href="/dashboard" className="font-medium underline underline-offset-4 hover:text-amber-900 dark:hover:text-amber-200">Notaify Dashboard</Link> after creating a project.
                 </p>
             </div>
 

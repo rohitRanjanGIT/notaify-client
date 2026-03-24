@@ -16,11 +16,11 @@ export default function FrameworksPage() {
           <CodeBlock
             language="javascript"
             code={`import express from 'express'
-import { notaify, notaifyMiddleware } from '@notaify/node'
+import notaify, { notaifyMiddleware } from '@notaify/node'
 
 notaify.init({
+  apiKeyId: process.env.NOTAIFY_API_KEY_ID,
   apiKey: process.env.NOTAIFY_API_KEY,
-  password: process.env.NOTAIFY_PASSWORD
 })
 
 const app = express()
@@ -42,17 +42,17 @@ app.listen(3000)`}
           <CodeBlock
             language="javascript"
             code={`import Fastify from 'fastify'
-import { notaify, notaifyMiddleware } from '@notaify/node'
+import notaify, { notaifyMiddleware } from '@notaify/node'
 
 notaify.init({
+  apiKeyId: process.env.NOTAIFY_API_KEY_ID,
   apiKey: process.env.NOTAIFY_API_KEY,
-  password: process.env.NOTAIFY_PASSWORD
 })
 
 const fastify = Fastify()
 
 // Set notaify as the global error handler
-fastify.setErrorHandler(notaifyMiddleware())
+fastify.setErrorHandler(notaifyMiddleware({ framework: 'fastify' }))
 
 fastify.get('/', async () => ({ hello: 'world' }))
 fastify.listen({ port: 3000 })`}
@@ -71,12 +71,12 @@ fastify.listen({ port: 3000 })`}
           <CodeBlock
             language="typescript"
             code={`// app/api/users/route.ts
-import { notaify, notaifyHandler } from '@notaify/node'
+import notaify, { notaifyHandler } from '@notaify/node'
 
 // Best to call init in a shared utility file, but shown here for clarity
 notaify.init({
+  apiKeyId: process.env.NOTAIFY_API_KEY_ID,
   apiKey: process.env.NOTAIFY_API_KEY,
-  password: process.env.NOTAIFY_PASSWORD
 })
 
 export const GET = notaifyHandler(async (req) => {
@@ -108,16 +108,16 @@ export const GET = notaifyHandler(async (req) => {
           <CodeBlock
             language="typescript"
             code={`// main.ts
-import { notaify } from '@notaify/node'
+import notaify from '@notaify/node'
 
 notaify.init({
+  apiKeyId: process.env.NOTAIFY_API_KEY_ID,
   apiKey: process.env.NOTAIFY_API_KEY,
-  password: process.env.NOTAIFY_PASSWORD
 })
 
 // notaify-exception.filter.ts
 import { Catch, ArgumentsHost } from '@nestjs/common'
-import { notaify } from '@notaify/node'
+import notaify from '@notaify/node'
 
 @Catch()
 export class NotaifyExceptionFilter {

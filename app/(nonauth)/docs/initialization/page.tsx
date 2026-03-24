@@ -20,11 +20,11 @@ export default function InitializationPage() {
                     <div className="not-prose mt-4">
                         <CodeBlock
                             language="javascript"
-                            code={`import { notaify } from '@notaify/node';
+                            code={`import notaify from '@notaify/node';
 
 notaify.init({
+  apiKeyId: process.env.NOTAIFY_API_KEY_ID,
   apiKey: process.env.NOTAIFY_API_KEY,
-  password: process.env.NOTAIFY_PASSWORD
 });`}
                         />
                     </div>

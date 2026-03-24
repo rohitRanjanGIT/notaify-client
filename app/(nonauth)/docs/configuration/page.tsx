@@ -25,16 +25,16 @@ export default function ConfigurationPage() {
                         </thead>
                         <tbody>
                             <tr className="border-b transition-colors hover:bg-muted/50">
+                                <td className="p-4 align-middle"><code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-xs font-semibold">apiKeyId</code></td>
+                                <td className="p-4 align-middle"><code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-xs text-pink-600 dark:text-pink-400">string</code></td>
+                                <td className="p-4 align-middle font-medium text-emerald-600 dark:text-emerald-500">Yes</td>
+                                <td className="p-4 align-middle">Your Notaify API Key ID (public identifier for lookup)</td>
+                            </tr>
+                            <tr className="border-b transition-colors hover:bg-muted/50">
                                 <td className="p-4 align-middle"><code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-xs font-semibold">apiKey</code></td>
                                 <td className="p-4 align-middle"><code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-xs text-pink-600 dark:text-pink-400">string</code></td>
                                 <td className="p-4 align-middle font-medium text-emerald-600 dark:text-emerald-500">Yes</td>
-                                <td className="p-4 align-middle">Your Notaify API key</td>
-                            </tr>
-                            <tr className="border-b transition-colors hover:bg-muted/50">
-                                <td className="p-4 align-middle"><code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-xs font-semibold">password</code></td>
-                                <td className="p-4 align-middle"><code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-xs text-pink-600 dark:text-pink-400">string</code></td>
-                                <td className="p-4 align-middle font-medium text-emerald-600 dark:text-emerald-500">Yes</td>
-                                <td className="p-4 align-middle">Your Notaify password</td>
+                                <td className="p-4 align-middle">Your Notaify API Key (secret key for authentication)</td>
                             </tr>
                             <tr className="border-b transition-colors hover:bg-muted/50">
                                 <td className="p-4 align-middle"><code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-xs font-semibold">environment</code></td>
@@ -54,6 +54,12 @@ export default function ConfigurationPage() {
                                 <td className="p-4 align-middle text-muted-foreground">No</td>
                                 <td className="p-4 align-middle">Suppress Notaify console logs (default: <code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-xs">false</code>)</td>
                             </tr>
+                            <tr className="border-b transition-colors hover:bg-muted/50">
+                                <td className="p-4 align-middle"><code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-xs font-semibold">serverUrl</code></td>
+                                <td className="p-4 align-middle"><code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-xs text-pink-600 dark:text-pink-400">string</code></td>
+                                <td className="p-4 align-middle text-muted-foreground">No</td>
+                                <td className="p-4 align-middle">Override the Notaify server URL (for self-hosted or local dev)</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -62,11 +68,11 @@ export default function ConfigurationPage() {
                     <CodeBlock
                         language="javascript"
                         code={`notaify.init({
+  apiKeyId: process.env.NOTAIFY_API_KEY_ID,
   apiKey: process.env.NOTAIFY_API_KEY,
-  password: process.env.NOTAIFY_PASSWORD,
   environment: 'production',
   appName: 'My API Server',
-  silent: true
+  silent: true,
 })`}
                     />
                 </div>
@@ -91,7 +97,7 @@ export default function ConfigurationPage() {
                 <h2 className="text-2xl font-semibold tracking-tight border-b pb-2">Security Recommendations</h2>
 
                 <ul className="my-6 ml-6 list-disc [&>li]:mt-2 text-foreground">
-                    <li>Your <code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">NOTAIFY_API_KEY</code> and <code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">NOTAIFY_PASSWORD</code> are used only to authenticate with the Notaify ingest server.</li>
+                    <li>Your <code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">NOTAIFY_API_KEY_ID</code> and <code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">NOTAIFY_API_KEY</code> are used only to authenticate with the Notaify ingest server.</li>
                     <li><strong>Never</strong> expose these in client-side code (e.g., <code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">NEXT_PUBLIC_*</code>).</li>
                     <li><strong>Never</strong> commit these keys to version control (e.g., git).</li>
                     <li>Always load them safely from environment variables on your Node server.</li>
@@ -102,8 +108,8 @@ export default function ConfigurationPage() {
                 <h2 className="text-2xl font-semibold tracking-tight border-b pb-2">Need Help?</h2>
 
                 <ul className="my-6 ml-6 list-disc [&>li]:mt-2 text-foreground">
-                    <li>Dashboard: <Link href="/dashboard" className="text-primary hover:underline underline-offset-4">notaify.com/dashboard</Link></li>
-                    <li>Support: <a href="mailto:support@notaify.com" className="text-primary hover:underline underline-offset-4">support@notaify.com</a></li>
+                    <li>Dashboard: <Link href="/dashboard" className="text-primary hover:underline underline-offset-4">notaify.vercel.app/dashboard</Link></li>
+                    <li>Support: <a href="mailto:support@notaify.vercel.app" className="text-primary hover:underline underline-offset-4">support@notaify.vercel.app</a></li>
                     <li>GitHub: <a href="https://github.com/notaify/node" target="_blank" rel="noreferrer" className="text-primary hover:underline underline-offset-4">github.com/notaify/node</a></li>
                 </ul>
             </div>

@@ -19,11 +19,11 @@ export default function UsagePage() {
                     <CodeBlock
                         language="javascript"
                         code={`// index.js / server.js
-import { notaify } from '@notaify/node'
+import notaify from '@notaify/node'
 
 notaify.init({
+  apiKeyId: process.env.NOTAIFY_API_KEY_ID,
   apiKey: process.env.NOTAIFY_API_KEY,
-  password: process.env.NOTAIFY_PASSWORD
 })
 
 // That's it. Every unhandled error from this point is auto-reported.`}
@@ -44,14 +44,14 @@ notaify.init({
                 <div className="not-prose mt-4">
                     <CodeBlock
                         language="javascript"
-                        code={`import { notaify } from '@notaify/node'
+                        code={`import notaify from '@notaify/node'
 
 try {
   await riskyOperation()
 } catch (error) {
   // Report to notaify
   await notaify.capture(error)
-  
+
   // optionally re-throw or handle gracefully
 }`}
                     />
@@ -140,7 +140,7 @@ import { notaifyMiddleware } from '@notaify/node'
 const fastify = Fastify()
 
 fastify.setErrorHandler(
-  notaifyMiddleware()
+  notaifyMiddleware({ framework: 'fastify' })
 )
 
 // route definitions...`}
