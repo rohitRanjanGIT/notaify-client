@@ -550,7 +550,7 @@ function AddProjectContent() {
 
   return (
     <TooltipProvider>
-      <main className="min-h-screen bg-muted/40 p-4 sm:p-6 lg:p-8">
+      <main className="min-h-screen bg-background px-4 pb-16 pt-8 sm:px-6 sm:pt-12">
         <div className="mx-auto max-w-4xl space-y-6">
           {/* Header Section */}
           <div>
@@ -561,15 +561,15 @@ function AddProjectContent() {
               </Button>
             </Link>
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-signal-soft">
                 {isEditMode ? (
-                  <FileText className="h-5 w-5 text-primary" />
+                  <FileText className="h-5 w-5 text-signal" />
                 ) : (
-                  <Plus className="h-5 w-5 text-primary" />
+                  <Plus className="h-5 w-5 text-signal" />
                 )}
               </div>
               <div>
-                <h1 className="text-2xl font-bold tracking-tight">
+                <h1 className="font-display text-3xl font-semibold tracking-tight">
                   {isEditMode ? 'Update Project' : 'Create New Project'}
                 </h1>
                 <p className="text-sm text-muted-foreground">
@@ -588,7 +588,7 @@ function AddProjectContent() {
             </Alert>
           )}
           {success && (
-            <Alert className="border-green-200 bg-green-50 text-green-900 dark:border-green-900 dark:bg-green-950/30 dark:text-green-100 [&>svg]:text-green-600 dark:[&>svg]:text-green-400">
+            <Alert className="border-success/30 bg-success-soft text-foreground [&>svg]:text-success">
               <CheckCircle2 className="h-4 w-4" />
               <AlertTitle>Success</AlertTitle>
               <AlertDescription>{success}</AlertDescription>
@@ -601,7 +601,7 @@ function AddProjectContent() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base">
-                  <FileText className="h-4 w-4 text-blue-500" />
+                  <FileText className="h-4 w-4 text-signal" />
                   Project Details
                 </CardTitle>
                 <CardDescription>
@@ -632,7 +632,7 @@ function AddProjectContent() {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-base">
-                    <Brain className="h-4 w-4 text-purple-500" />
+                    <Brain className="h-4 w-4 text-plum" />
                     LLM Configuration
                   </CardTitle>
                   <CardDescription>
@@ -731,7 +731,7 @@ function AddProjectContent() {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-base">
-                    <Mail className="h-4 w-4 text-green-500" />
+                    <Mail className="h-4 w-4 text-success" />
                     Email Configuration
                   </CardTitle>
                   <CardDescription>
@@ -788,12 +788,12 @@ function AddProjectContent() {
             </div>
 
             {/* Unified Test Configuration Section */}
-            <Card className="border-dashed border-2 bg-slate-50 border-slate-200 dark:bg-slate-900/30 dark:border-slate-800">
+            <Card className="border-dashed border-2 bg-muted/50">
               <CardContent className="pt-6">
                 <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between mb-4">
                   <div>
                     <h3 className="text-lg font-medium flex items-center gap-2">
-                      <FlaskConical className="h-5 w-5 text-blue-500" />
+                      <FlaskConical className="h-5 w-5 text-signal" />
                       Test Your Configurations
                     </h3>
                     <p className="text-sm text-muted-foreground">Verify both LLM and SMTP integrations before saving.</p>
@@ -801,7 +801,7 @@ function AddProjectContent() {
                   <Button
                     type="button"
                     variant="outline"
-                    className="w-full sm:w-auto shrink-0 border-blue-200 bg-white text-blue-700 hover:bg-blue-50 hover:text-blue-800 dark:border-blue-800 dark:bg-slate-950 dark:text-blue-400 dark:hover:bg-blue-900/30"
+                    className="w-full sm:w-auto shrink-0 rounded-full hover:border-signal/50 hover:text-signal"
                     onClick={handleTestAllConfigs}
                     disabled={isTestingAll}
                   >
@@ -825,18 +825,18 @@ function AddProjectContent() {
                       variant={testResult.smtp.type === 'error' ? 'destructive' : 'default'}
                       className={
                         testResult.smtp.type === 'success'
-                          ? 'border-green-200 bg-green-50 text-green-900 dark:border-green-900 dark:bg-green-950/30 dark:text-green-100'
+                          ? 'border-success/30 bg-success-soft text-foreground'
                           : testResult.smtp.type === 'pending'
-                            ? 'border-blue-200 bg-blue-50 text-blue-900 dark:border-blue-900 dark:bg-blue-950/30 dark:text-blue-100'
+                            ? 'border-signal/30 bg-signal-soft text-foreground'
                             : ''
                       }
                     >
                       {testResult.smtp.type === 'success' ? (
-                        <CheckCircle2 className="h-4 w-4 !text-green-600 dark:!text-green-400" />
+                        <CheckCircle2 className="h-4 w-4 !text-success" />
                       ) : testResult.smtp.type === 'error' ? (
                         <AlertCircle className="h-4 w-4" />
                       ) : (
-                        <Loader2 className="h-4 w-4 animate-spin !text-blue-600 dark:!text-blue-400" />
+                        <Loader2 className="h-4 w-4 animate-spin !text-signal" />
                       )}
                       <AlertTitle className="text-sm font-medium">SMTP Connection</AlertTitle>
                       <AlertDescription className="text-xs">
@@ -849,18 +849,18 @@ function AddProjectContent() {
                       variant={testResult.llm.type === 'error' ? 'destructive' : 'default'}
                       className={
                         testResult.llm.type === 'success'
-                          ? 'border-green-200 bg-green-50 text-green-900 dark:border-green-900 dark:bg-green-950/30 dark:text-green-100'
+                          ? 'border-success/30 bg-success-soft text-foreground'
                           : testResult.llm.type === 'pending'
-                            ? 'border-purple-200 bg-purple-50 text-purple-900 dark:border-purple-900 dark:bg-purple-950/30 dark:text-purple-100'
+                            ? 'border-plum/25 bg-plum-soft text-foreground'
                             : ''
                       }
                     >
                       {testResult.llm.type === 'success' ? (
-                        <CheckCircle2 className="h-4 w-4 !text-green-600 dark:!text-green-400" />
+                        <CheckCircle2 className="h-4 w-4 !text-success" />
                       ) : testResult.llm.type === 'error' ? (
                         <AlertCircle className="h-4 w-4" />
                       ) : (
-                        <Loader2 className="h-4 w-4 animate-spin !text-purple-600 dark:!text-purple-400" />
+                        <Loader2 className="h-4 w-4 animate-spin !text-plum" />
                       )}
                       <AlertTitle className="text-sm font-medium">LLM API Call</AlertTitle>
                       <AlertDescription className="text-xs">
@@ -878,7 +878,7 @@ function AddProjectContent() {
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
                   <div className="space-y-1">
                     <CardTitle className="flex items-center gap-2 text-base">
-                      <KeyRound className="h-4 w-4 text-amber-500" />
+                      <KeyRound className="h-4 w-4 text-signal" />
                       Notaify API Key
                     </CardTitle>
                     <CardDescription>
@@ -919,7 +919,7 @@ function AddProjectContent() {
                             onClick={() => copyToClipboard(formData.notaifyApiKeyId || '', 'apiId')}
                           >
                             {copiedField === 'apiId' ? (
-                              <Check className="h-4 w-4 text-green-500" />
+                              <Check className="h-4 w-4 text-success" />
                             ) : (
                               <Copy className="h-4 w-4" />
                             )}
@@ -970,7 +970,7 @@ function AddProjectContent() {
                                 onClick={() => copyToClipboard(formData.notaifyApiKey || '', 'apiKey')}
                               >
                                 {copiedField === 'apiKey' ? (
-                                  <Check className="h-4 w-4 text-green-500" />
+                                  <Check className="h-4 w-4 text-success" />
                                 ) : (
                                   <Copy className="h-4 w-4" />
                                 )}
@@ -1027,7 +1027,7 @@ function AddProjectContent() {
             <AlertDialogContent>
               <AlertDialogHeader>
                 <AlertDialogTitle className="flex items-center gap-2">
-                  <ShieldAlert className="h-5 w-5 text-amber-500" />
+                  <ShieldAlert className="h-5 w-5 text-signal" />
                   Regenerate API Key?
                 </AlertDialogTitle>
                 <AlertDialogDescription>
@@ -1047,8 +1047,8 @@ function AddProjectContent() {
           <Dialog open={showNewApiKeyDialog} onOpenChange={setShowNewApiKeyDialog}>
             <DialogContent className="sm:max-w-md">
               <DialogHeader>
-                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30 mb-2">
-                  <CheckCircle2 className="h-6 w-6 text-green-600 dark:text-green-400" />
+                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-success-soft mb-2">
+                  <CheckCircle2 className="h-6 w-6 text-success" />
                 </div>
                 <DialogTitle className="text-center">API Key Generated</DialogTitle>
                 <DialogDescription className="text-center">
@@ -1075,7 +1075,7 @@ function AddProjectContent() {
                             onClick={() => copyToClipboard(newlyGeneratedKey.apiKeyId, 'dialogApiId')}
                           >
                             {copiedField === 'dialogApiId' ? (
-                              <Check className="h-3.5 w-3.5 text-green-500" />
+                              <Check className="h-3.5 w-3.5 text-success" />
                             ) : (
                               <Copy className="h-3.5 w-3.5" />
                             )}
@@ -1123,7 +1123,7 @@ function AddProjectContent() {
                             onClick={() => copyToClipboard(newlyGeneratedKey.apiKey, 'dialogApiKey')}
                           >
                             {copiedField === 'dialogApiKey' ? (
-                              <Check className="h-3.5 w-3.5 text-green-500" />
+                              <Check className="h-3.5 w-3.5 text-success" />
                             ) : (
                               <Copy className="h-3.5 w-3.5" />
                             )}
@@ -1137,7 +1137,7 @@ function AddProjectContent() {
                   </div>
 
                   {/* Warning */}
-                  <Alert className="border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-900 dark:bg-amber-950/30 dark:text-amber-100 [&>svg]:text-amber-600 dark:[&>svg]:text-amber-400">
+                  <Alert className="border-signal/30 bg-signal-soft text-foreground [&>svg]:text-signal">
                     <ShieldAlert className="h-4 w-4" />
                     <AlertDescription className="text-xs">
                       Store this key in a secure location. It will not be displayed again after closing this dialog.

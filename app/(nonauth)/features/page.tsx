@@ -1,285 +1,258 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Link from "next/link";
 import {
-    Zap,
-    Shield,
-    Search,
-    BellRing,
-    Terminal,
     Activity,
+    BellRing,
     BrainCircuit,
-    Layers,
-    Code,
+    Check,
     Network,
-    Cpu,
-    CheckCircle2
+    Search,
+    Shield,
+    Terminal,
+    Zap,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
+import Cta from "@/lib/components/home/cta";
+
+const coreFeatures = [
+    {
+        title: "Fast alerts",
+        description: "Critical error alerts land in your inbox within 5–8 seconds of the crash. Never be the last to know.",
+        icon: Zap,
+    },
+    {
+        title: "Encrypted credentials",
+        description: "API keys and SMTP passwords are AES-encrypted at rest, and never exposed back to the browser in plain text.",
+        icon: Shield,
+    },
+    {
+        title: "Intelligent parsing",
+        description: "Raw V8 stack traces are parsed into file, line and reason so the culprit is obvious at a glance.",
+        icon: Search,
+    },
+    {
+        title: "Native email reports",
+        description: "No webhooks to configure. Full-context bug reports go straight to your team over your own SMTP.",
+        icon: BellRing,
+    },
+    {
+        title: "Pre-flight config tests",
+        description: "Validate SMTP routing and LLM configuration from the dashboard before you deploy to production.",
+        icon: Activity,
+    },
+    {
+        title: "Universal middleware",
+        description: "One SDK for Express, Fastify, Next.js and NestJS — global capture, wrappers or middleware.",
+        icon: Terminal,
+    },
+];
 
 export default function FeaturesPage() {
-    const coreFeatures = [
-        {
-            title: "Lightning Fast Alerts",
-            description: "Receive critical error alerts in your inbox within 5-8 seconds of the crash occurring. Never be the last to know.",
-            icon: <Zap className="w-8 h-8" />,
-            color: "from-amber-400 to-orange-500",
-            bgLight: "bg-amber-500/10",
-            iconColor: "text-amber-500",
-        },
-        {
-            title: "Bank-Grade Security",
-            description: "Your API keys and passwords are AES-encrypted at rest. We securely process logs without ever exposing your sensitive infrastructure.",
-            icon: <Shield className="w-8 h-8" />,
-            color: "from-blue-400 to-indigo-500",
-            bgLight: "bg-blue-500/10",
-            iconColor: "text-blue-500",
-        },
-        {
-            title: "Intelligent Parsing",
-            description: "Stack traces are automatically parsed, formatting raw V8 outputs into highly readable mapped tables to find the culprit line instantly.",
-            icon: <Search className="w-8 h-8" />,
-            color: "from-emerald-400 to-green-500",
-            bgLight: "bg-emerald-500/10",
-            iconColor: "text-emerald-500",
-        },
-        {
-            title: "Native Email rendering",
-            description: "Forget configuring complex webhooks. Professional bug reports with full context injected directly into your engineering team's inbox.",
-            icon: <BellRing className="w-8 h-8" />,
-            color: "from-purple-400 to-pink-500",
-            bgLight: "bg-purple-500/10",
-            iconColor: "text-purple-500",
-        },
-        {
-            title: "Pre-flight Config Test",
-            description: "Validate your SMTP routing and LLM configurations independently through our dash before deploying into production environments.",
-            icon: <Activity className="w-8 h-8" />,
-            color: "from-rose-400 to-red-500",
-            bgLight: "bg-rose-500/10",
-            iconColor: "text-rose-500",
-        },
-        {
-            title: "Universal Middleware",
-            description: "Drop a single line of SDK code into your Express, Fastify, Next.js, or NestJS backend—it seamlessly self-wraps around endpoints.",
-            icon: <Terminal className="w-8 h-8" />,
-            color: "from-cyan-400 to-blue-500",
-            bgLight: "bg-cyan-500/10",
-            iconColor: "text-cyan-500",
-        }
-    ];
-
-    const deepDives = [
-        {
-            title: "AI-Powered Diagnostics",
-            subtitle: "Let LLMs find the bug before you even open your IDE.",
-            description: "Connect your OpenAI or Anthropic API key to auto-diagnose errors. Our engine reads the stack trace, understands your framework context, and generates a plain-English explanation along with a fix suggestion.",
-            icon: <BrainCircuit className="w-6 h-6" />,
-            color: "from-violet-500 to-purple-600",
-            visual: (
-                <div className="w-full h-full bg-[#0d1117] rounded-2xl border border-zinc-800 p-6 font-mono text-sm flex flex-col gap-3 shadow-2xl relative overflow-hidden group">
-                    <div className="flex items-center gap-2 mb-2 pb-2 border-b border-zinc-800">
-                        <div className="w-3 h-3 rounded-full bg-red-500" />
-                        <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                        <div className="w-3 h-3 rounded-full bg-green-500" />
-                        <span className="text-zinc-500 ml-2 text-xs">AI Diagnostics</span>
-                    </div>
-                    <div className="text-red-400 font-semibold">TypeError: Cannot read properties of undefined (reading 'map')</div>
-                    <div className="text-zinc-400 pl-4 py-2 border-l-2 border-zinc-800">
-                        <span className="text-purple-400">AI Analysis: </span>
-                        The error occurs because <span className="text-rose-300">`userData.items`</span> is undefined when the API responds with a 404.
-                        Add optional chaining or provide a fallback array.
-                    </div>
-                    <div className="mt-2 text-green-400 flex items-start gap-2 bg-green-500/10 p-3 rounded-lg border border-green-500/20">
-                        <CheckCircle2 className="w-4 h-4 mt-0.5" />
-                        <span>Fix applied: <span className="text-zinc-300">`userData?.items?.map(...) ?? []`</span></span>
-                    </div>
+    return (
+        <div className="relative overflow-x-clip">
+            {/* Header */}
+            <section className="relative overflow-hidden">
+                <div aria-hidden className="bg-dots pointer-events-none absolute inset-0 -z-10 opacity-60 [mask-image:radial-gradient(ellipse_60%_80%_at_20%_0%,black,transparent_70%)]" />
+                <div className="mx-auto max-w-6xl px-4 pb-16 pt-16 sm:px-6 sm:pt-24">
+                    <motion.p
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5 }}
+                        className="eyebrow flex items-center gap-2"
+                    >
+                        <span className="h-px w-6 bg-signal" /> Features
+                    </motion.p>
+                    <motion.h1
+                        initial={{ opacity: 0, y: 16 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 0.05, ease: [0.22, 1, 0.36, 1] }}
+                        className="mt-5 max-w-4xl font-display text-5xl font-semibold leading-[0.98] tracking-[-0.035em] text-balance sm:text-7xl"
+                    >
+                        Built for the moment <span className="text-signal">production breaks.</span>
+                    </motion.h1>
+                    <motion.p
+                        initial={{ opacity: 0, y: 16 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
+                        className="mt-7 max-w-2xl text-lg leading-relaxed text-muted-foreground"
+                    >
+                        Everything Notaify does is aimed at one number: how long it takes your team to go from an
+                        error to an answer.
+                    </motion.p>
                 </div>
-            )
-        },
-        {
-            title: "Seamless Framework Integration",
-            subtitle: "One SDK to rule them all.",
-            description: "Whether you're building a monolith in Express, microservices in Fastify, or full-stack apps in Next.js, the @notaify/node package unifies your error tracking. No more jumping between different logging platforms.",
-            icon: <Network className="w-6 h-6" />,
-            color: "from-blue-500 to-cyan-500",
-            visual: (
-                <div className="w-full h-full grid grid-cols-2 gap-4 p-4">
-                    {["Express.js", "Fastify", "NestJS", "Next.js"].map((framework, i) => (
-                        <div key={i} className="bg-white/5 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-800 rounded-xl p-6 flex flex-col items-center justify-center gap-3 backdrop-blur-md hover:bg-white/10 dark:hover:bg-zinc-700/50 transition-colors">
-                            <Layers className="w-8 h-8 text-blue-500/80" />
-                            <span className="font-semibold text-zinc-800 dark:text-zinc-200">{framework}</span>
-                        </div>
+            </section>
+
+            {/* Core features — hairline grid */}
+            <section className="mx-auto max-w-6xl px-4 sm:px-6">
+                <div className="grid overflow-hidden rounded-[1.6rem] border bg-border sm:grid-cols-2 lg:grid-cols-3 [&>*]:bg-card gap-px">
+                    {coreFeatures.map((f, i) => (
+                        <motion.div
+                            key={f.title}
+                            initial={{ opacity: 0 }}
+                            whileInView={{ opacity: 1 }}
+                            viewport={{ once: true, margin: "-40px" }}
+                            transition={{ duration: 0.5, delay: (i % 3) * 0.08 }}
+                            className="group relative p-7 sm:p-8"
+                        >
+                            <div className="flex items-center justify-between">
+                                <span className="flex h-10 w-10 items-center justify-center rounded-xl border bg-background transition-colors group-hover:border-signal/50 group-hover:text-signal">
+                                    <f.icon className="h-[18px] w-[18px]" />
+                                </span>
+                                <span className="font-mono text-xs text-muted-foreground/60">0{i + 1}</span>
+                            </div>
+                            <h3 className="mt-6 font-display text-xl font-semibold tracking-tight">{f.title}</h3>
+                            <p className="mt-2 text-[15px] leading-relaxed text-muted-foreground">{f.description}</p>
+                        </motion.div>
                     ))}
                 </div>
-            ),
-            reverse: true
-        },
-        {
-            title: "Real-time Dashboarding",
-            subtitle: "Your command center for system health.",
-            description: "Filter, sort, and analyze errors across multiple projects. View error spikes instantly and drill down into the exact geographical locale, user agent, and payload state the moment the crash happened.",
-            icon: <Activity className="w-6 h-6" />,
-            color: "from-emerald-500 to-teal-500",
-            visual: (
-                <div className="w-full h-full bg-white dark:bg-[#111113] rounded-2xl border border-zinc-200 dark:border-zinc-800 p-6 flex flex-col gap-4 shadow-xl">
-                    <div className="flex justify-between items-center pb-2 border-b border-zinc-100 dark:border-zinc-800">
-                        <span className="font-semibold text-zinc-900 dark:text-zinc-100">Project Overview</span>
-                        <div className="flex gap-2">
-                            <div className="w-20 h-6 bg-emerald-100 dark:bg-emerald-900/30 rounded-full animate-pulse" />
-                            <div className="w-16 h-6 bg-zinc-100 dark:bg-zinc-800 rounded-full" />
-                        </div>
-                    </div>
-                    <div className="flex-1 flex items-end gap-2 pt-6">
-                        {[40, 70, 45, 90, 65, 30, 85, 50, 100, 60, 40].map((h, i) => (
-                            <div key={i} className={`w-full bg-emerald-500/80 rounded-t-sm`} style={{ height: `${h}%` }} />
-                        ))}
-                    </div>
-                </div>
-            )
-        }
-    ];
+            </section>
 
+            {/* Deep dives */}
+            <section className="mx-auto max-w-6xl space-y-24 px-4 py-24 sm:px-6 sm:py-32 lg:space-y-32">
+                <DeepDive
+                    icon={BrainCircuit}
+                    eyebrow="AI diagnostics"
+                    title="Let the model find the bug before you open your IDE."
+                    body="Connect a Gemini, OpenAI or Anthropic key and every error is auto-diagnosed. Notaify reads the stack trace, understands the framework context, and writes a plain-English explanation with a suggested fix."
+                    visual={<DiagnosisVisual />}
+                />
+                <DeepDive
+                    reverse
+                    icon={Network}
+                    eyebrow="Framework integration"
+                    title="One SDK, whatever your server looks like."
+                    body="A monolith on Express, services on Fastify, a full-stack app on Next.js or a NestJS API — @notaify/node covers them all, so error tracking stops being something you set up per project."
+                    visual={<FrameworksVisual />}
+                />
+                <DeepDive
+                    icon={Activity}
+                    eyebrow="Dashboard"
+                    title="A home for every project and every error."
+                    body="Create projects, generate API keys, test your SMTP and LLM setup, and browse every captured error with the AI's analysis alongside it."
+                    visual={<DashboardVisual />}
+                />
+            </section>
 
+            <Cta title="Ready when your next error is." />
+        </div>
+    );
+}
 
+function DeepDive({
+    icon: Icon,
+    eyebrow,
+    title,
+    body,
+    visual,
+    reverse,
+}: {
+    icon: React.ComponentType<{ className?: string }>;
+    eyebrow: string;
+    title: string;
+    body: string;
+    visual: React.ReactNode;
+    reverse?: boolean;
+}) {
     return (
-        <div className="min-h-screen bg-zinc-50 dark:bg-[#050505] relative overflow-hidden">
-            {/* Background Effects */}
-            <div className="absolute top-0 inset-x-0 h-96 bg-gradient-to-b from-blue-500/10 dark:from-blue-500/5 to-transparent pointer-events-none" />
-            <div className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[1200px] h-[1200px] opacity-20 dark:opacity-10 pointer-events-none bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.2)_0,transparent_50%)]" />
+        <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+            className={cn("grid grid-cols-[minmax(0,1fr)] items-center gap-12 lg:grid-cols-2 lg:gap-20", reverse && "lg:[&>*:first-child]:order-2")}
+        >
+            <div>
+                <p className="eyebrow flex items-center gap-2">
+                    <Icon className="h-3.5 w-3.5 text-signal" />
+                    {eyebrow}
+                </p>
+                <h2 className="mt-4 font-display text-3xl font-semibold leading-[1.05] tracking-[-0.03em] text-balance sm:text-[2.6rem]">
+                    {title}
+                </h2>
+                <p className="mt-5 max-w-lg text-lg leading-relaxed text-muted-foreground">{body}</p>
+            </div>
+            <div className="relative">
+                <div aria-hidden className="absolute -inset-6 -z-10 rounded-[2.5rem] bg-signal/10 blur-3xl dark:bg-signal/[0.06]" />
+                {visual}
+            </div>
+        </motion.div>
+    );
+}
 
-            <div className="container mx-auto px-4 py-24 sm:px-6 lg:px-8 relative z-10">
-                <div className="mx-auto max-w-7xl">
-                    {/* Heroes */}
-                    <div className="relative text-center mb-24 max-w-3xl mx-auto">
-                        {/* Decorative Icons in Empty Spaces */}
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.8 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ duration: 0.7, delay: 0.2 }}
-                            className="absolute -top-12 -left-12 lg:-left-24 hidden md:flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500/10 to-indigo-500/10 border border-blue-500/20 text-blue-500 shadow-2xl backdrop-blur-xl"
-                        >
-                            <Terminal className="w-8 h-8" />
-                        </motion.div>
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.8 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ duration: 0.7, delay: 0.4 }}
-                            className="absolute top-10 -right-12 lg:-right-24 hidden md:flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20 text-purple-500 shadow-2xl backdrop-blur-xl"
-                        >
-                            <Zap className="w-10 h-10" />
-                        </motion.div>
+function DiagnosisVisual() {
+    return (
+        <div className="overflow-hidden rounded-[1.4rem] border bg-code p-6 font-mono text-[13px] leading-relaxed text-code-foreground shadow-[0_40px_80px_-40px_color-mix(in_oklch,var(--primary)_55%,transparent)] dark:border-white/10">
+            <div className="mb-4 flex items-center justify-between border-b border-white/[0.07] pb-3 text-[11px] text-white/45">
+                <span>diagnosis · checkout-api</span>
+                <span className="text-signal">● new</span>
+            </div>
+            <p className="text-[oklch(0.75_0.15_25)]">TypeError: Cannot read properties of undefined (reading &apos;map&apos;)</p>
+            <p className="mt-1 text-white/35">    at renderItems (services/cart.js:42:21)</p>
+            <div className="mt-5 border-l-2 border-[oklch(0.78_0.11_345)] pl-4 font-sans text-[14px] text-white/80">
+                <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-[oklch(0.78_0.11_345)]">Analysis</span>
+                <p className="mt-1.5">
+                    <code className="font-mono text-white">userData.items</code> is undefined when the upstream API
+                    responds with a 404. Guard the access or fall back to an empty array.
+                </p>
+            </div>
+            <div className="mt-5 flex items-start gap-2 rounded-xl bg-[oklch(0.74_0.14_155/0.1)] p-3 text-[oklch(0.82_0.13_155)]">
+                <Check className="mt-0.5 h-4 w-4 shrink-0" />
+                <span>
+                    Suggested fix: <span className="text-white/85">userData?.items?.map(…) ?? []</span>
+                </span>
+            </div>
+        </div>
+    );
+}
 
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.6 }}
-                        >
-                            <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-zinc-900 dark:text-white mb-6 text-balance">
-                                Power user capabilities.
-                            </h1>
-                            <p className="text-xl text-zinc-600 dark:text-zinc-400 leading-relaxed text-balance">
-                                Discover the suite of advanced features that make Notaify the ultimate error resolution platform for high-velocity engineering teams.
-                            </p>
-                        </motion.div>
-                    </div>
-
-                    {/* Core Features Grid */}
-                    <div className="mb-32">
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 xl:gap-10">
-                            {coreFeatures.map((feature, index) => (
-                                <motion.div
-                                    key={index}
-                                    initial={{ opacity: 0, y: 30 }}
-                                    whileInView={{ opacity: 1, y: 0 }}
-                                    viewport={{ once: true, margin: "-50px" }}
-                                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                                    className="group relative"
-                                >
-                                    {/* Glowing backdrop on hover */}
-                                    <div className={`absolute inset-0 bg-gradient-to-br ${feature.color} opacity-0 group-hover:opacity-100 blur-2xl transition-opacity duration-500 -z-10 dark:opacity-0 dark:group-hover:opacity-30`} />
-
-                                    <div className="h-full bg-white dark:bg-zinc-900/60 backdrop-blur-xl rounded-3xl p-8 shadow-sm border border-zinc-200 dark:border-white/10 hover:border-zinc-300 dark:hover:border-white/20 transition-all duration-300">
-                                        <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-6 ${feature.bgLight} text-zinc-900 dark:text-white border border-black/5 dark:border-white/10 shadow-inner group-hover:scale-110 transition-transform duration-500`}>
-                                            <div className={`${feature.iconColor}`}>
-                                                {feature.icon}
-                                            </div>
-                                        </div>
-                                        <h3 className="text-2xl font-bold text-zinc-900 dark:text-white mb-3">
-                                            {feature.title}
-                                        </h3>
-                                        <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed">
-                                            {feature.description}
-                                        </p>
-                                    </div>
-                                </motion.div>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Deep Dives Section */}
-                    <div className="space-y-32 mb-32">
-                        {deepDives.map((dive, index) => (
-                            <motion.div
-                                key={index}
-                                initial={{ opacity: 0, y: 40 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true, margin: "-100px" }}
-                                transition={{ duration: 0.7 }}
-                                className={`flex flex-col lg:flex-row gap-12 lg:gap-24 items-center ${dive.reverse ? 'lg:flex-row-reverse' : ''}`}
-                            >
-                                <div className="flex-1 space-y-6">
-                                    <div className={`inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br ${dive.color} text-white shadow-lg`}>
-                                        {dive.icon}
-                                    </div>
-                                    <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-zinc-900 dark:text-white">
-                                        {dive.title}
-                                    </h2>
-                                    <h3 className="text-xl md:text-2xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-zinc-500 to-zinc-400 dark:from-zinc-400 dark:to-zinc-500">
-                                        {dive.subtitle}
-                                    </h3>
-                                    <p className="text-lg text-zinc-600 dark:text-zinc-400 leading-relaxed">
-                                        {dive.description}
-                                    </p>
-                                </div>
-                                <div className="flex-1 w-full lg:w-auto h-[350px] md:h-[450px] relative">
-                                    <div className={`absolute inset-0 bg-gradient-to-br ${dive.color} opacity-20 blur-3xl -z-10 rounded-[3rem]`} />
-                                    <div className="h-full w-full rounded-[2rem] border border-zinc-200/50 dark:border-white/10 bg-zinc-100/50 dark:bg-zinc-900/50 backdrop-blur-3xl overflow-hidden shadow-2xl flex items-center justify-center p-4 md:p-8">
-                                        {dive.visual}
-                                    </div>
-                                </div>
-                            </motion.div>
-                        ))}
-                    </div>
-
-
-
-
-                    {/* CTA */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.6 }}
-                        className="text-center pb-24"
-                    >
-                        <h2 className="text-4xl font-bold text-zinc-900 dark:text-white mb-8">Ready to supercharge your workflow?</h2>
-                        <div className="inline-flex gap-4 items-center">
-                            <Link
-                                href="/register"
-                                className="inline-flex h-14 items-center justify-center rounded-full bg-blue-600 px-10 py-3 text-base font-medium text-white transition-all hover:bg-blue-700 hover:scale-105 active:scale-95 shadow-[0_0_40px_-10px_rgba(37,99,235,0.5)]"
-                            >
-                                Get Started Free
-                            </Link>
-                            <Link
-                                href="/docs"
-                                className="inline-flex h-14 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-900 px-10 py-3 text-base font-medium text-zinc-900 dark:text-white transition-all hover:bg-zinc-200 dark:hover:bg-zinc-800"
-                            >
-                                Read the Docs
-                            </Link>
-                        </div>
-                    </motion.div>
+function FrameworksVisual() {
+    const items = [
+        { name: "Express", api: "notaifyMiddleware()" },
+        { name: "Fastify", api: "setErrorHandler(…)" },
+        { name: "Next.js", api: "notaifyHandler(…)" },
+        { name: "NestJS", api: "notaify.capture(…)" },
+    ];
+    return (
+        <div className="panel grid grid-cols-2 gap-px overflow-hidden !bg-border p-0">
+            {items.map((it, i) => (
+                <div key={it.name} className="bg-card p-6 sm:p-7">
+                    <span className="font-mono text-[11px] text-muted-foreground">0{i + 1}</span>
+                    <p className="mt-6 font-display text-2xl font-semibold tracking-tight">{it.name}</p>
+                    <p className="mt-1 truncate font-mono text-xs text-signal">{it.api}</p>
                 </div>
+            ))}
+        </div>
+    );
+}
+
+function DashboardVisual() {
+    const bars = [30, 52, 38, 70, 44, 26, 62, 48, 88, 40, 34, 56];
+    return (
+        <div className="panel p-6">
+            <div className="flex items-center justify-between border-b pb-4">
+                <div>
+                    <p className="font-display text-lg font-semibold tracking-tight">checkout-api</p>
+                    <p className="font-mono text-[11px] text-muted-foreground">errors · last 12 hours</p>
+                </div>
+                <span className="rounded-full bg-success-soft px-2.5 py-1 font-mono text-[11px] text-success">SMTP ✓ LLM ✓</span>
+            </div>
+            <div className="flex h-44 items-end gap-1.5 pt-6">
+                {bars.map((h, i) => (
+                    <motion.div
+                        key={i}
+                        initial={{ height: 0 }}
+                        whileInView={{ height: `${h}%` }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.6, delay: i * 0.04, ease: [0.22, 1, 0.36, 1] }}
+                        className={cn("flex-1 rounded-t-md", i === 8 ? "bg-signal" : "bg-foreground/15")}
+                    />
+                ))}
+            </div>
+            <div className="mt-4 flex items-center gap-3 rounded-xl border bg-background px-3 py-2.5 text-sm">
+                <span className="h-2 w-2 rounded-full bg-signal" />
+                <span className="min-w-0 flex-1 truncate font-mono text-[12px]">ECONNREFUSED 127.0.0.1:5432</span>
+                <span className="font-mono text-[11px] text-muted-foreground">peak</span>
             </div>
         </div>
     );

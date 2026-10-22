@@ -20,6 +20,7 @@ import {
   CheckCircle2,
   FlaskConical,
   BookOpenText,
+  KeyRound,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -266,26 +267,32 @@ export default function DashboardPage() {
 
   return (
     <TooltipProvider>
-      <main className="min-h-screen bg-background px-4 py-8 sm:px-6 lg:px-8">
+      <main className="min-h-screen bg-background px-4 pb-16 pt-8 sm:px-6 sm:pt-12">
         <div className="mx-auto max-w-6xl space-y-8">
           {/* Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <h1 className="text-2xl font-semibold tracking-tight">{displayName}</h1>
-            <div className="flex items-center gap-3">
-              <Link href="/dashboard/addProject">
-                <Button variant="outline" size="sm">
-                  New project
-                </Button>
-              </Link>
-              <div className="relative w-56">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="eyebrow flex items-center gap-2">
+                <span className="h-px w-6 bg-signal" /> Dashboard
+              </p>
+              <h1 className="mt-3 font-display text-3xl font-semibold tracking-tight sm:text-4xl">{displayName}</h1>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="relative flex-1 sm:w-64 sm:flex-none">
+                <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
-                  placeholder="Search..."
+                  placeholder="Search projects…"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 h-8 text-sm"
+                  className="h-10 rounded-full bg-card pl-10 text-sm"
+                  aria-label="Search projects"
                 />
               </div>
+              <Link href="/dashboard/addProject" className="btn-signal !h-10 !px-4 shrink-0">
+                <Plus className="h-4 w-4" />
+                <span className="hidden sm:inline">New project</span>
+                <span className="sr-only sm:hidden">New project</span>
+              </Link>
             </div>
           </div>
 
@@ -298,7 +305,7 @@ export default function DashboardPage() {
             </Alert>
           )}
           {success && (
-            <Alert className="border-green-200 bg-green-50 text-green-900 dark:border-green-900 dark:bg-green-950/30 dark:text-green-100 [&>svg]:text-green-600 dark:[&>svg]:text-green-400">
+            <Alert className="border-success/30 bg-success-soft text-foreground [&>svg]:text-success">
               <CheckCircle2 className="h-4 w-4" />
               <AlertTitle>Success</AlertTitle>
               <AlertDescription>{success}</AlertDescription>
@@ -307,25 +314,21 @@ export default function DashboardPage() {
 
           {/* Stats Row */}
           {!isLoading && projects.length > 0 && (
-            <div className="rounded-lg border border-border">
-              <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-border">
-                <div className="px-5 py-4">
-                  <p className="text-xs text-muted-foreground mb-1">📁 Projects</p>
-                  <p className="text-lg font-semibold">{totalProjects}</p>
+            <div className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border bg-border sm:grid-cols-4">
+              {[
+                { label: 'Projects', value: totalProjects, icon: FolderOpen },
+                { label: 'LLM configured', value: activeLLMs, icon: Brain },
+                { label: 'Email enabled', value: emailConfigured, icon: Mail },
+                { label: 'API keys', value: apiKeysGenerated, icon: KeyRound },
+              ].map((stat) => (
+                <div key={stat.label} className="bg-card px-5 py-5">
+                  <div className="flex items-center justify-between">
+                    <p className="eyebrow">{stat.label}</p>
+                    <stat.icon className="h-4 w-4 text-muted-foreground/70" />
+                  </div>
+                  <p className="mt-3 font-display text-3xl font-semibold tracking-tight">{stat.value}</p>
                 </div>
-                <div className="px-5 py-4">
-                  <p className="text-xs text-muted-foreground mb-1">🤖 LLM configured</p>
-                  <p className="text-lg font-semibold">{activeLLMs}</p>
-                </div>
-                <div className="px-5 py-4">
-                  <p className="text-xs text-muted-foreground mb-1">📧 Email enabled</p>
-                  <p className="text-lg font-semibold">{emailConfigured}</p>
-                </div>
-                <div className="px-5 py-4">
-                  <p className="text-xs text-muted-foreground mb-1">🔑 API keys</p>
-                  <p className="text-lg font-semibold">{apiKeysGenerated}</p>
-                </div>
-              </div>
+              ))}
             </div>
           )}
 
@@ -335,7 +338,7 @@ export default function DashboardPage() {
               <Skeleton className="h-[72px] w-full rounded-lg" />
               <Skeleton className="h-5 w-28" />
               <Skeleton className="h-9 w-full rounded-md" />
-              <div className="space-y-0 rounded-lg border border-border overflow-hidden">
+              <div className="space-y-0 overflow-hidden rounded-2xl border border-border">
                 {[...Array(3)].map((_, i) => (
                   <div key={i} className="flex items-center gap-6 px-5 py-4 border-b border-border last:border-0">
                     <Skeleton className="h-4 w-[120px]" />
@@ -348,33 +351,31 @@ export default function DashboardPage() {
             </div>
           ) : projects.length === 0 ? (
             /* Empty State */
-            <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-border py-20 text-center">
-              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-muted mb-4">
-                <FolderOpen className="h-6 w-6 text-muted-foreground" />
+            <div className="bg-dots flex flex-col items-center justify-center rounded-2xl border border-dashed border-border px-6 py-20 text-center">
+              <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl border bg-card shadow-sm">
+                <FolderOpen className="h-6 w-6 text-signal" />
               </div>
-              <h3 className="text-base font-semibold mb-1">No projects yet</h3>
+              <h3 className="mb-1 font-display text-xl font-semibold tracking-tight">No projects yet</h3>
               <p className="text-sm text-muted-foreground max-w-xs mb-6">
                 Get started by creating your first project. Configure LLM providers, email alerts, and generate API keys.
               </p>
-              <Link href="/dashboard/addProject">
-                <Button size="sm">
-                  <Sparkles className="mr-2 h-3.5 w-3.5" />
-                  Create your first project
-                </Button>
+              <Link href="/dashboard/addProject" className="btn-signal !h-10">
+                <Sparkles className="h-3.5 w-3.5" />
+                Create your first project
               </Link>
             </div>
           ) : (
             <>
               {/* Project Count */}
-              <h2 className="text-base font-semibold">
-                {totalProjects} Project{totalProjects !== 1 ? 's' : ''}
+              <h2 className="eyebrow">
+                {filteredProjects.length} of {totalProjects} project{totalProjects !== 1 ? 's' : ''}
               </h2>
 
               {/* Projects Table */}
-              <div className="rounded-lg border border-border overflow-hidden">
+              <div className="panel overflow-hidden">
                 <Table>
                   <TableHeader>
-                    <TableRow className="hover:bg-transparent">
+                    <TableRow className="bg-muted/50 hover:bg-muted/50">
                       <TableHead className="pl-5 text-xs font-medium text-muted-foreground">Name</TableHead>
                       <TableHead className="text-xs font-medium text-muted-foreground">LLM Provider</TableHead>
                       <TableHead className="text-xs font-medium text-muted-foreground">Model</TableHead>
@@ -441,7 +442,7 @@ export default function DashboardPage() {
                                       onClick={() => copyToClipboard(project.notaifyApiKeyId || '', `id-${project.project_id}`)}
                                     >
                                       {copiedId === `id-${project.project_id}` ? (
-                                        <Check className="h-3 w-3 text-green-500" />
+                                        <Check className="h-3 w-3 text-success" />
                                       ) : (
                                         <Copy className="h-3 w-3" />
                                       )}
@@ -463,7 +464,7 @@ export default function DashboardPage() {
                                       onClick={() => copyToClipboard(project.notaifyApiKey || '', `key-${project.project_id}`)}
                                     >
                                       {copiedId === `key-${project.project_id}` ? (
-                                        <Check className="h-3 w-3 text-green-500" />
+                                        <Check className="h-3 w-3 text-success" />
                                       ) : (
                                         <Copy className="h-3 w-3" />
                                       )}
@@ -491,7 +492,7 @@ export default function DashboardPage() {
                                     <Button
                                       variant="ghost"
                                       size="icon"
-                                      className="h-7 w-7 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:text-blue-500 dark:hover:text-blue-400 dark:hover:bg-blue-950/30"
+                                      className="h-8 w-8 rounded-full text-muted-foreground hover:bg-signal-soft hover:text-signal"
                                       onClick={() => handleTestConfigs(project.project_id, !!project.llmType)}
                                       disabled={testingConfigId === project.project_id}
                                     >
@@ -512,7 +513,7 @@ export default function DashboardPage() {
                                   <Button
                                     variant="ghost"
                                     size="icon"
-                                    className="h-7 w-7 text-green-600 hover:text-green-700 hover:bg-green-50 dark:text-green-500 dark:hover:text-green-400 dark:hover:bg-green-950/30"
+                                    className="h-8 w-8 rounded-full text-muted-foreground hover:bg-success-soft hover:text-success"
                                     asChild
                                   >
                                     <Link href={`/dashboard/logs?projectId=${project.project_id}`}>
@@ -531,7 +532,7 @@ export default function DashboardPage() {
                                   <Button
                                     variant="ghost"
                                     size="icon"
-                                    className="h-7 w-7 text-muted-foreground hover:text-foreground"
+                                    className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground"
                                     asChild
                                   >
                                     <Link href={`/dashboard/addProject?id=${project.project_id}`}>
@@ -550,7 +551,7 @@ export default function DashboardPage() {
                                       <Button
                                         variant="ghost"
                                         size="icon"
-                                        className="h-7 w-7 text-muted-foreground hover:text-destructive"
+                                        className="h-8 w-8 rounded-full text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
                                       >
                                         <Trash2 className="h-3.5 w-3.5" />
                                         <span className="sr-only">Delete</span>

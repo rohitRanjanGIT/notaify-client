@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import Image from "next/image";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
+import { ArrowRight, ArrowUpRight, Menu } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
-import { Menu, ExternalLink, Github } from "lucide-react";
 import {
     Sheet,
     SheetContent,
@@ -14,142 +14,162 @@ import {
     SheetTitle,
     SheetTrigger,
 } from "@/components/ui/sheet";
+import { cn } from "@/lib/utils";
+import BrandMark from "./brand-mark";
 
 const navItems = [
-    { name: "Home", href: "/" },
     { name: "Features", href: "/features" },
     { name: "Docs", href: "/docs" },
-    { name: "NPM", href: "https://www.npmjs.com/package/notaify", external: true },
     { name: "Dashboard", href: "/dashboard" },
+    { name: "npm", href: "https://www.npmjs.com/package/notaify", external: true },
 ];
 
+function isActive(pathname: string, href: string) {
+    if (href === "/") return pathname === "/";
+    return pathname === href || pathname.startsWith(`${href}/`);
+}
+
 export default function Header() {
+    const pathname = usePathname();
     const [isOpen, setIsOpen] = useState(false);
+    const [scrolled, setScrolled] = useState(false);
+
+    useEffect(() => {
+        const onScroll = () => setScrolled(window.scrollY > 8);
+        onScroll();
+        window.addEventListener("scroll", onScroll, { passive: true });
+        return () => window.removeEventListener("scroll", onScroll);
+    }, []);
+
+    // Auth pages carry their own full-screen layout with branding.
+    if (pathname === "/login" || pathname === "/register") return null;
 
     return (
-        <header className="sticky top-0 z-50 w-full border-b border-gray-200/50 bg-white/70 backdrop-blur-xl dark:border-gray-800/50 dark:bg-black/70 transition-all duration-300">
-            <div className="container mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
-                {/* Logo */}
-                <div className="flex shrink-0 items-center">
-                    <Link href="/" className="flex items-center gap-2.5 group transition-all">
-                        <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-xl bg-gradient-to-tr from-indigo-500/20 to-purple-500/20 p-1 dark:from-indigo-500/10 dark:to-purple-500/10 border border-indigo-500/10 dark:border-indigo-400/10">
-                            <div className="relative h-full w-full">
-                                <Image
-                                    src="/notaify_logo.png"
-                                    alt="Notaify Logo"
-                                    fill
-                                    className="object-contain transition-transform group-hover:scale-110 duration-500"
-                                    priority
-                                />
-                            </div>
-                        </div>
-                        <span className="font-bold text-xl tracking-tight text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                            Notaify
-                        </span>
+        <header
+            className={cn(
+                "sticky top-0 z-50 w-full transition-[padding] duration-300",
+                scrolled ? "pt-2" : "pt-3 sm:pt-4"
+            )}
+        >
+            <div className="mx-auto max-w-6xl px-3 sm:px-6">
+                <div
+                    className={cn(
+                        "flex h-14 items-center justify-between rounded-full border pl-3 pr-2 transition-all duration-300",
+                        scrolled
+                            ? "border-border bg-background/80 shadow-[0_8px_30px_-12px_color-mix(in_oklch,var(--primary)_25%,transparent)] backdrop-blur-xl"
+                            : "border-transparent bg-transparent"
+                    )}
+                >
+                    <Link href="/" className="group flex items-center gap-2.5 rounded-full pr-2" aria-label="Notaify home">
+                        <BrandMark className="h-8 w-8 transition-transform duration-500 group-hover:rotate-[-6deg]" />
+                        <span className="font-display text-[1.15rem] font-semibold tracking-tight">Notaify</span>
                     </Link>
-                </div>
 
-                {/* Desktop Navigation */}
-                <nav className="hidden md:flex items-center gap-1">
-                    {navItems.map((item) => (
-                        <Link
-                            key={item.href}
-                            href={item.href}
-                            target={item.external ? "_blank" : undefined}
-                            rel={item.external ? "noopener noreferrer" : undefined}
-                            className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50 flex items-center gap-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-900 transition-all"
-                        >
-                            {item.name}
-                            {item.external && <ExternalLink className="h-3 w-3 opacity-50" />}
-                        </Link>
-                    ))}
-                </nav>
+                    <nav className="hidden items-center gap-0.5 md:flex" aria-label="Main">
+                        {navItems.map((item) => {
+                            const active = !item.external && isActive(pathname, item.href);
+                            return (
+                                <Link
+                                    key={item.href}
+                                    href={item.href}
+                                    target={item.external ? "_blank" : undefined}
+                                    rel={item.external ? "noopener noreferrer" : undefined}
+                                    aria-current={active ? "page" : undefined}
+                                    className={cn(
+                                        "relative inline-flex items-center gap-1 rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors",
+                                        active
+                                            ? "bg-foreground/[0.06] text-foreground"
+                                            : "text-muted-foreground hover:text-foreground"
+                                    )}
+                                >
+                                    {item.name}
+                                    {item.external && <ArrowUpRight className="h-3.5 w-3.5 opacity-60" />}
+                                </Link>
+                            );
+                        })}
+                    </nav>
 
-                {/* Right Side Actions */}
-                <div className="flex items-center gap-2 sm:gap-4">
-                    <div className="hidden sm:flex items-center gap-2 border-r pr-4 border-gray-200 dark:border-gray-800 mr-2">
+                    <div className="flex items-center gap-1.5">
                         <ThemeToggle />
-                    </div>
 
-                    <SignedOut>
-                        <div className="hidden sm:flex items-center gap-3">
+                        <SignedOut>
                             <Link
                                 href="/login"
-                                className="text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50 transition-colors px-2"
+                                className="hidden rounded-full px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground sm:inline-flex"
                             >
-                                Login
+                                Log in
                             </Link>
-                            <Link
-                                href="/register"
-                                className="inline-flex h-10 items-center justify-center rounded-full bg-black px-6 py-2 text-sm font-semibold text-white shadow-[0_4px_14px_0_rgba(0,0,0,0.25)] transition-all hover:bg-gray-800 hover:shadow-[0_6px_20px_rgba(0,0,0,0.3)] active:scale-95 dark:bg-white dark:text-black dark:hover:bg-gray-200"
-                            >
-                                Sign Up
+                            <Link href="/register" className="btn-signal hidden !h-9 !px-4 sm:inline-flex">
+                                Get started
+                                <ArrowRight className="h-3.5 w-3.5" />
                             </Link>
-                        </div>
-                    </SignedOut>
+                        </SignedOut>
 
-                    <SignedIn>
-                        <UserButton
-                            afterSignOutUrl="/"
-                            appearance={{
-                                elements: {
-                                    avatarBox: "h-9 w-9 border border-gray-200 dark:border-gray-800"
-                                }
-                            }}
-                        />
-                    </SignedIn>
+                        <SignedIn>
+                            <div className="pl-1">
+                                <UserButton
+                                    appearance={{
+                                        elements: {
+                                            avatarBox: "h-8 w-8 ring-2 ring-border",
+                                        },
+                                    }}
+                                />
+                            </div>
+                        </SignedIn>
 
-                    {/* Mobile Menu Trigger */}
-                    <div className="md:hidden flex items-center gap-2">
-                        <ThemeToggle />
                         <Sheet open={isOpen} onOpenChange={setIsOpen}>
                             <SheetTrigger asChild>
-                                <Button variant="ghost" size="icon" className="h-10 w-10 hover:bg-gray-100 dark:hover:bg-gray-900 rounded-full">
-                                    <Menu className="h-6 w-6" />
-                                    <span className="sr-only">Toggle menu</span>
+                                <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full md:hidden">
+                                    <Menu className="h-5 w-5" />
+                                    <span className="sr-only">Open menu</span>
                                 </Button>
                             </SheetTrigger>
-                            <SheetContent side="right" className="w-[300px] sm:w-[350px] p-0 border-l border-gray-200/50 dark:border-gray-800/50 bg-white/95 dark:bg-black/95 backdrop-blur-xl">
-                                <SheetHeader className="p-6 border-b border-gray-100 dark:border-gray-900">
-                                    <SheetTitle className="flex items-center gap-2 text-xl font-bold tracking-tight">
-                                        <div className="relative h-8 w-8 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
-                                            <Image src="/notaify_logo.png" alt="Logo" fill className="object-contain p-1" />
-                                        </div>
+                            <SheetContent side="right" className="flex w-[300px] flex-col gap-0 border-l bg-background p-0 sm:w-[340px]">
+                                <SheetHeader className="border-b p-5">
+                                    <SheetTitle className="flex items-center gap-2.5 font-display text-lg font-semibold tracking-tight">
+                                        <BrandMark className="h-7 w-7" />
                                         Notaify
                                     </SheetTitle>
                                 </SheetHeader>
-                                <div className="flex flex-col gap-1 p-4">
-                                    {navItems.map((item) => (
-                                        <Link
-                                            key={item.href}
-                                            href={item.href}
-                                            onClick={() => setIsOpen(false)}
-                                            target={item.external ? "_blank" : undefined}
-                                            rel={item.external ? "noopener noreferrer" : undefined}
-                                            className="flex items-center justify-between px-4 py-4 rounded-2xl text-lg font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-900 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all border border-transparent hover:border-gray-200 dark:hover:border-gray-800"
-                                        >
-                                            {item.name}
-                                            {item.external ? <ExternalLink className="h-4 w-4 opacity-50" /> : <div className="h-2 w-2 rounded-full bg-indigo-500/20" />}
-                                        </Link>
-                                    ))}
-                                </div>
-                                <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-gray-100 dark:border-gray-900 bg-white/50 dark:bg-black/50 backdrop-blur-sm space-y-4">
+                                <nav className="flex flex-col gap-1 p-3" aria-label="Mobile">
+                                    {[{ name: "Home", href: "/" }, ...navItems].map((item) => {
+                                        const active = !item.external && isActive(pathname, item.href);
+                                        return (
+                                            <Link
+                                                key={item.href}
+                                                href={item.href}
+                                                onClick={() => setIsOpen(false)}
+                                                target={item.external ? "_blank" : undefined}
+                                                rel={item.external ? "noopener noreferrer" : undefined}
+                                                className={cn(
+                                                    "flex items-center justify-between rounded-xl px-4 py-3 text-base font-medium transition-colors",
+                                                    active ? "bg-accent text-foreground" : "text-muted-foreground hover:bg-accent hover:text-foreground"
+                                                )}
+                                            >
+                                                {item.name}
+                                                {item.external ? (
+                                                    <ArrowUpRight className="h-4 w-4 opacity-60" />
+                                                ) : active ? (
+                                                    <span className="h-1.5 w-1.5 rounded-full bg-signal" />
+                                                ) : null}
+                                            </Link>
+                                        );
+                                    })}
+                                </nav>
+                                <div className="mt-auto border-t p-5">
                                     <SignedOut>
-                                        <div className="grid grid-cols-2 gap-3">
-                                            <Button variant="outline" asChild className="rounded-xl h-12">
-                                                <Link href="/login" onClick={() => setIsOpen(false)}>Login</Link>
-                                            </Button>
-                                            <Button asChild className="rounded-xl h-12 bg-black text-white dark:bg-white dark:text-black hover:opacity-90 shadow-lg">
-                                                <Link href="/register" onClick={() => setIsOpen(false)}>Sign Up</Link>
-                                            </Button>
+                                        <div className="grid grid-cols-2 gap-2">
+                                            <Link href="/login" onClick={() => setIsOpen(false)} className="btn-ghost !h-11">
+                                                Log in
+                                            </Link>
+                                            <Link href="/register" onClick={() => setIsOpen(false)} className="btn-signal !h-11">
+                                                Sign up
+                                            </Link>
                                         </div>
                                     </SignedOut>
-                                    <div className="flex items-center justify-between px-2 text-gray-500">
-                                        <Link href="https://github.com" target="_blank" className="p-2 hover:bg-gray-100 dark:hover:bg-gray-900 rounded-full transition-colors">
-                                            <Github className="h-5 w-5" />
-                                        </Link>
-                                        <p className="text-xs font-medium">© {new Date().getFullYear()} Notaify</p>
-                                    </div>
+                                    <p className="mt-4 font-mono text-[11px] text-muted-foreground">
+                                        © {new Date().getFullYear()} Notaify
+                                    </p>
                                 </div>
                             </SheetContent>
                         </Sheet>

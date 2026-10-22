@@ -13,7 +13,7 @@ export default function ConfigurationPage() {
                     When calling <code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">notaify.init(config)</code>, you can provide the following options to customize the behavior of the agent:
                 </p>
 
-                <div className="overflow-x-auto my-6 not-prose rounded-md border">
+                <div className="overflow-x-auto my-6 not-prose rounded-xl border">
                     <table className="w-full text-left border-collapse text-sm">
                         <thead className="bg-muted/50">
                             <tr className="border-b">
@@ -27,13 +27,13 @@ export default function ConfigurationPage() {
                             <tr className="border-b transition-colors hover:bg-muted/50">
                                 <td className="p-4 align-middle"><code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-xs font-semibold">apiKeyId</code></td>
                                 <td className="p-4 align-middle"><code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-xs text-pink-600 dark:text-pink-400">string</code></td>
-                                <td className="p-4 align-middle font-medium text-emerald-600 dark:text-emerald-500">Yes</td>
+                                <td className="p-4 align-middle font-medium text-success">Yes</td>
                                 <td className="p-4 align-middle">Your Notaify API Key ID (public identifier for lookup)</td>
                             </tr>
                             <tr className="border-b transition-colors hover:bg-muted/50">
                                 <td className="p-4 align-middle"><code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-xs font-semibold">apiKey</code></td>
                                 <td className="p-4 align-middle"><code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-xs text-pink-600 dark:text-pink-400">string</code></td>
-                                <td className="p-4 align-middle font-medium text-emerald-600 dark:text-emerald-500">Yes</td>
+                                <td className="p-4 align-middle font-medium text-success">Yes</td>
                                 <td className="p-4 align-middle">Your Notaify API Key (secret key for authentication)</td>
                             </tr>
                             <tr className="border-b transition-colors hover:bg-muted/50">
