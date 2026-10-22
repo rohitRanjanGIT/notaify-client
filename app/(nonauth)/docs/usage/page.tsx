@@ -30,7 +30,7 @@ notaify.init({
                     />
                 </div>
 
-                <div className="rounded-md border p-4 bg-muted/50 mt-4 text-sm">
+                <div className="mt-4 rounded-xl border border-dashed bg-muted/60 px-4 py-3 text-sm">
                     <strong>Best for:</strong> Any Node.js app where you want zero-effort, blanket error coverage.
                 </div>
             </div>
@@ -70,7 +70,7 @@ try {
                     />
                 </div>
 
-                <div className="rounded-md border p-4 bg-muted/50 mt-4 text-sm">
+                <div className="mt-4 rounded-xl border border-dashed bg-muted/60 px-4 py-3 text-sm">
                     <strong>Best for:</strong> Specific critical operations where you want targeted error reporting with extra context.
                 </div>
             </div>
@@ -100,7 +100,7 @@ export const GET = notaifyHandler(async (req) => {
                     />
                 </div>
 
-                <div className="rounded-md border p-4 bg-muted/50 mt-4 text-sm">
+                <div className="mt-4 rounded-xl border border-dashed bg-muted/60 px-4 py-3 text-sm">
                     <strong>Best for:</strong> Next.js API routes, individual Express routes, or any async function where you want per-route error capture without boilerplate.
                 </div>
             </div>
@@ -147,7 +147,7 @@ fastify.setErrorHandler(
                     />
                 </div>
 
-                <div className="rounded-md border p-4 bg-muted/50 mt-4 text-sm mt-8">
+                <div className="mt-4 rounded-xl border border-dashed bg-muted/60 px-4 py-3 text-sm mt-8">
                     <strong>Best for:</strong> Express and Fastify apps where you want centralized error handling in one place.
                 </div>
             </div>

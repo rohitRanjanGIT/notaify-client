@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { Check, Copy } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Button } from "./ui/button";
 
 interface CodeBlockProps {
     code: string;
@@ -25,30 +24,37 @@ export function CodeBlock({ code, language, className }: CodeBlockProps) {
     };
 
     return (
-        <div className={cn("relative group rounded-lg overflow-hidden border bg-zinc-950", className)}>
-            <div className="flex items-center justify-between px-4 py-2 border-b border-zinc-800 bg-zinc-900/50">
-                <span className="text-xs font-medium text-zinc-400 capitalize">
+        <div
+            data-codeblock
+            className={cn(
+                "group relative overflow-hidden rounded-2xl border bg-code text-code-foreground dark:border-white/10",
+                className
+            )}
+        >
+            <div className="flex items-center justify-between border-b border-white/[0.07] py-1.5 pl-4 pr-1.5">
+                <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-white/40">
                     {language || "code"}
                 </span>
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-6 w-6 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 focus-visible:ring-1 focus-visible:ring-zinc-700"
+                <button
+                    type="button"
+                    className="flex h-7 items-center gap-1.5 rounded-full px-2.5 text-[11px] font-medium text-white/50 transition-colors hover:bg-white/[0.08] hover:text-white"
                     onClick={copyToClipboard}
                     aria-label="Copy code"
                 >
                     {isCopied ? (
-                        <Check className="h-3 w-3 text-emerald-500" />
+                        <>
+                            <Check className="h-3 w-3 text-success" /> Copied
+                        </>
                     ) : (
-                        <Copy className="h-3 w-3" />
+                        <>
+                            <Copy className="h-3 w-3" /> Copy
+                        </>
                     )}
-                </Button>
+                </button>
             </div>
-            <div className="p-4 overflow-x-auto">
-                <code className="text-sm font-mono text-zinc-50 leading-relaxed whitespace-pre">
-                    {code}
-                </code>
-            </div>
+            <pre className="overflow-x-auto p-4 text-[13px] leading-[1.7]">
+                <code className="font-mono">{code}</code>
+            </pre>
         </div>
     );
 }

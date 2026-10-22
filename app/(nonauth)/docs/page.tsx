@@ -14,12 +14,12 @@ export default function DocsPage() {
                 </p>
             </div>
 
-            <div className="not-prose my-8 rounded-lg border border-blue-200 bg-blue-50 p-6 dark:border-blue-900/50 dark:bg-blue-900/20">
+            <div className="not-prose my-8 rounded-2xl border border-signal/30 bg-signal-soft p-5 sm:p-6">
                 <div className="flex items-center gap-2 mb-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-blue-600 dark:text-blue-400"><circle cx="12" cy="12" r="10" /><line x1="12" x2="12" y1="8" y2="12" /><line x1="12" x2="12.01" y1="16" y2="16" /></svg>
-                    <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-300">Core Mission</h3>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-signal"><circle cx="12" cy="12" r="10" /><line x1="12" x2="12" y1="8" y2="12" /><line x1="12" x2="12.01" y1="16" y2="16" /></svg>
+                    <h3 className="font-display text-lg font-semibold tracking-tight text-foreground">Core Mission</h3>
                 </div>
-                <p className="mt-2 text-sm text-blue-800 dark:text-blue-400">
+                <p className="mt-2 text-sm leading-relaxed text-foreground/80">
                     Notaify helps you know what broke, why it broke, and what to do next without having to dig through server logs.
                 </p>
             </div>

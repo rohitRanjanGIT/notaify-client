@@ -140,7 +140,7 @@ function LogsContent() {
     };
 
     return (
-        <main className="min-h-screen bg-muted/40 p-4 sm:p-6 lg:p-8">
+        <main className="min-h-screen bg-background px-4 pb-16 pt-8 sm:px-6 sm:pt-12">
             <div className="mx-auto max-w-6xl space-y-6">
 
                 {/* Header */}
@@ -152,8 +152,8 @@ function LogsContent() {
                                 Back to Dashboard
                             </Button>
                         </Link>
-                        <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-                            <BookOpenText className="h-6 w-6 text-primary" />
+                        <h1 className="font-display text-3xl font-semibold tracking-tight flex items-center gap-2.5">
+                            <BookOpenText className="h-6 w-6 text-signal" />
                             Error Logs
                         </h1>
                         <p className="text-sm text-muted-foreground mt-1">
@@ -171,7 +171,7 @@ function LogsContent() {
                 )}
 
                 {/* Filters */}
-                <div className="flex flex-col sm:flex-row gap-3 bg-card p-3 rounded-lg border border-border">
+                <div className="panel flex flex-col sm:flex-row gap-3 p-3">
                     <div className="relative flex-1">
                         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                         <Input
@@ -202,9 +202,9 @@ function LogsContent() {
                         <Skeleton className="h-16 w-full" />
                     </div>
                 ) : logs.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-border py-20 text-center bg-card">
+                    <div className="bg-dots flex flex-col items-center justify-center rounded-2xl border border-dashed border-border py-20 text-center">
                         <div className="flex h-14 w-14 items-center justify-center rounded-full bg-muted mb-4">
-                            <CheckCircle2 className="h-6 w-6 text-green-500" />
+                            <CheckCircle2 className="h-6 w-6 text-success" />
                         </div>
                         <h3 className="text-lg font-semibold mb-1">No Errors Logged</h3>
                         <p className="text-sm text-muted-foreground max-w-sm">
@@ -219,7 +219,7 @@ function LogsContent() {
                         </Button>
                     </div>
                 ) : (
-                    <div className="rounded-lg border border-border overflow-hidden bg-card">
+                    <div className="panel overflow-hidden">
                         <Table>
                             <TableHeader>
                                 <TableRow className="hover:bg-transparent">
@@ -254,7 +254,7 @@ function LogsContent() {
                                             </TableCell>
                                             <TableCell>
                                                 {log.isTrial ? (
-                                                    <Badge variant="outline" className="text-blue-600 bg-blue-50 border-blue-200 dark:bg-blue-950/30 dark:border-blue-900 border font-normal">
+                                                    <Badge variant="outline" className="border-plum/25 bg-plum-soft text-plum font-normal">
                                                         <Beaker className="w-3 h-3 mr-1" />
                                                         Trial Test
                                                     </Badge>
@@ -291,8 +291,8 @@ function LogsContent() {
 
                                                         <div className="space-y-6 mt-4">
                                                             <div>
-                                                                <h4 className="text-sm font-semibold mb-2 flex items-center gap-1.5"><AlertCircle className="w-4 h-4 text-red-500" /> Raw Error Trace</h4>
-                                                                <div className="p-3 bg-red-50 text-red-900 dark:bg-red-950/30 dark:text-red-200 rounded-md text-sm font-mono whitespace-pre-wrap border border-red-100 dark:border-red-900 max-h-[200px] overflow-y-auto">
+                                                                <h4 className="text-sm font-semibold mb-2 flex items-center gap-1.5"><AlertCircle className="w-4 h-4 text-destructive" /> Raw Error Trace</h4>
+                                                                <div className="p-3 bg-destructive/[0.06] text-foreground rounded-xl text-sm font-mono whitespace-pre-wrap border border-destructive/25 max-h-[200px] overflow-y-auto">
                                                                     {log.error}
                                                                 </div>
                                                             </div>
@@ -318,8 +318,8 @@ function LogsContent() {
                                                                         <p className="mt-2"><strong className="text-foreground">Reason:</strong> {parsed.reason}</p>
                                                                     </div>
 
-                                                                    <div className="p-4 bg-green-50 text-green-900 dark:bg-green-950/20 dark:text-green-100 border border-green-200 dark:border-green-900/50 rounded-md">
-                                                                        <h4 className="text-sm font-semibold mb-2 flex items-center gap-1.5 text-green-700 dark:text-green-400">
+                                                                    <div className="p-4 bg-success-soft text-foreground border border-success/30 rounded-xl">
+                                                                        <h4 className="text-sm font-semibold mb-2 flex items-center gap-1.5 text-success">
                                                                             <Wrench className="w-4 h-4" /> Recommended Solution
                                                                         </h4>
                                                                         <p className="text-sm leading-relaxed whitespace-pre-wrap">{parsed.solution}</p>

@@ -1,73 +1,120 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { Check, FileSearch, KeyRound, Layers, ListTree, Mail, Sparkles, FlaskConical } from "lucide-react";
+import { cn } from "@/lib/utils";
+import SectionHeading from "./section-heading";
 
 export default function Features() {
-    const features = [
-        {
-            title: "Real-time AI Diagnosis",
-            description: "No more scrolling through infinite logs. Our integrated AI agents process the crash instantly and output a plain-English explanation of exactly what broke and how to solve it.",
-            icon: (
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456Z" />
-                </svg>
-            )
-        },
-        {
-            title: "Automatic Stack Trace Parsing",
-            description: "Errors are ingested directly from your V8 runtime, parsed out efficiently mapping line numbers, and formatted into beautiful tables that highlight the culprit files immediately.",
-            icon: (
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z" />
-                </svg>
-            )
-        },
-        {
-            title: "Native Email rendering",
-            description: "No need for external webhooks. Professional, detailed bug reports are beautifully crafted and pushed straight via SMTP to your engineering team's inbox directly.",
-            icon: (
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
-                </svg>
-            )
-        }
-    ];
-
     return (
-        <section className="py-24 bg-white dark:bg-[#050505] relative border-t border-black/5 dark:border-white/5">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
-                <div className="flex flex-col items-center text-center max-w-3xl mx-auto mb-20">
-                    <h2 className="text-3xl md:text-5xl font-extrabold tracking-tight text-zinc-900 dark:text-white">
-                        Designed for Developer Velocity
-                    </h2>
-                    <p className="mt-6 text-xl text-zinc-600 dark:text-zinc-400">
-                        Powerful features designed solely to shrink your mean-time-to-resolution to near zero.
-                    </p>
-                </div>
+        <section className="relative border-t bg-surface py-24 sm:py-32">
+            <div className="mx-auto max-w-6xl px-4 sm:px-6">
+                <SectionHeading
+                    eyebrow="What you get"
+                    title="Everything between “it broke” and “it's fixed”."
+                    description="Built to shrink the time from the first error to the first useful clue."
+                />
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
-                    {features.map((feature, idx) => (
-                        <motion.div
-                            key={idx}
-                            initial={{ opacity: 0, y: 30 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.5, delay: idx * 0.1 }}
-                            className="flex flex-col items-center text-center group"
-                        >
-                            <div className="h-16 w-16 mb-8 rounded-2xl bg-zinc-100 text-zinc-900 shadow-sm flex items-center justify-center border border-black/5 dark:bg-zinc-900 dark:text-white dark:border-white/10 transition-all duration-300 group-hover:scale-110 group-hover:shadow-md group-hover:-translate-y-2">
-                                {feature.icon}
-                            </div>
-                            <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-4">
-                                {feature.title}
-                            </h3>
-                            <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed max-w-sm">
-                                {feature.description}
-                            </p>
-                        </motion.div>
-                    ))}
+                <div className="mt-14 grid gap-4 md:grid-cols-3">
+                    <Tile className="md:col-span-2" icon={Sparkles} title="AI root-cause analysis" index={0}
+                        body="Bring your own model. Notaify reads the trace and the request, then writes a plain-English diagnosis with a suggested fix.">
+                        <div className="mt-6 flex flex-wrap gap-2">
+                            {["Gemini", "OpenAI", "Claude"].map((m, i) => (
+                                <span key={m} className={cn(
+                                    "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium",
+                                    i === 0 ? "border-signal/40 bg-signal-soft text-foreground" : "bg-background text-muted-foreground"
+                                )}>
+                                    <span className={cn("h-1.5 w-1.5 rounded-full", i === 0 ? "bg-signal" : "bg-muted-foreground/40")} />
+                                    {m}
+                                </span>
+                            ))}
+                        </div>
+                    </Tile>
+
+                    <Tile icon={KeyRound} title="Encrypted at rest" index={1}
+                        body="LLM keys and SMTP credentials are encrypted before they touch the database.">
+                        <div className="mt-6 rounded-xl border bg-background px-3 py-2.5 font-mono text-xs text-muted-foreground">
+                            smtpPass <span className="text-foreground/40">=</span> <span className="tracking-widest text-foreground/70">••••••••••</span>
+                        </div>
+                    </Tile>
+
+                    <Tile icon={FlaskConical} title="Pre-flight testing" index={2}
+                        body="Send a test email and ping your model from the dashboard before going live.">
+                        <ul className="mt-6 space-y-2 text-sm">
+                            {["SMTP test email sent", "LLM integration OK"].map((t) => (
+                                <li key={t} className="flex items-center gap-2 rounded-xl border bg-background px-3 py-2">
+                                    <span className="flex h-4 w-4 items-center justify-center rounded-full bg-success-soft text-success">
+                                        <Check className="h-3 w-3" />
+                                    </span>
+                                    {t}
+                                </li>
+                            ))}
+                        </ul>
+                    </Tile>
+
+                    <Tile className="md:col-span-2" icon={ListTree} title="Every error, searchable" index={3}
+                        body="Each project keeps a log of what was captured and what the AI said about it — filter by type and dig in.">
+                        <div className="mt-6 overflow-hidden rounded-xl border bg-background text-[13px]">
+                            {[
+                                { t: "2m", msg: "TypeError: Cannot read properties of undefined", kind: "error" },
+                                { t: "1h", msg: "ECONNREFUSED 127.0.0.1:5432", kind: "error" },
+                                { t: "3h", msg: "Test error from dashboard", kind: "test" },
+                            ].map((r) => (
+                                <div key={r.msg} className="flex items-center gap-3 border-b px-3 py-2.5 last:border-b-0">
+                                    <span className="w-6 font-mono text-[11px] text-muted-foreground">{r.t}</span>
+                                    <span className="min-w-0 flex-1 truncate font-mono text-[12px]">{r.msg}</span>
+                                    <span className={cn(
+                                        "rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider",
+                                        r.kind === "error" ? "bg-destructive/10 text-destructive" : "bg-plum-soft text-plum"
+                                    )}>
+                                        {r.kind}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    </Tile>
+
+                    <Tile icon={Mail} title="Straight to your inbox" index={4}
+                        body="Detailed reports over your own SMTP. No webhooks, no extra tools to check." />
+                    <Tile icon={FileSearch} title="Readable stack traces" index={5}
+                        body="Traces are parsed into file, line and reason, so the culprit stands out at a glance." />
+                    <Tile icon={Layers} title="Framework-ready" index={6}
+                        body="Global auto-capture, manual capture, handler wrappers and middleware for Express, Fastify, NestJS and Next.js." />
                 </div>
             </div>
         </section>
+    );
+}
+
+function Tile({
+    icon: Icon,
+    title,
+    body,
+    children,
+    className,
+    index,
+}: {
+    icon: React.ComponentType<{ className?: string }>;
+    title: string;
+    body: string;
+    children?: React.ReactNode;
+    className?: string;
+    index: number;
+}) {
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-60px" }}
+            transition={{ duration: 0.55, delay: (index % 3) * 0.07, ease: [0.22, 1, 0.36, 1] }}
+            className={cn("panel group relative overflow-hidden p-6 sm:p-7", className)}
+        >
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl border bg-background text-foreground transition-colors duration-300 group-hover:border-signal/50 group-hover:text-signal">
+                <Icon className="h-[18px] w-[18px]" />
+            </div>
+            <h3 className="mt-5 font-display text-xl font-semibold tracking-tight">{title}</h3>
+            <p className="mt-2 max-w-md text-[15px] leading-relaxed text-muted-foreground">{body}</p>
+            {children}
+        </motion.div>
     );
 }

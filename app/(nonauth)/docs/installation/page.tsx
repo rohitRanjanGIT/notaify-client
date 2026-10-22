@@ -40,13 +40,13 @@ export default function InstallationPage() {
                 </div>
             </div>
 
-            <div className="not-prose my-8 rounded-lg border border-amber-200 bg-amber-50 p-6 dark:border-amber-900/50 dark:bg-amber-900/20">
+            <div className="not-prose my-8 rounded-2xl border border-plum/25 bg-plum-soft p-5 sm:p-6">
                 <div className="flex items-center gap-2 mb-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-amber-600 dark:text-amber-400"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" /><path d="M12 9v4" /><path d="M12 17h.01" /></svg>
-                    <h3 className="text-lg font-semibold text-amber-900 dark:text-amber-300">Where do I get my credentials?</h3>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-plum"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" /><path d="M12 9v4" /><path d="M12 17h.01" /></svg>
+                    <h3 className="font-display text-lg font-semibold tracking-tight text-foreground">Where do I get my credentials?</h3>
                 </div>
-                <p className="mt-2 text-sm text-amber-800 dark:text-amber-400">
-                    You can get your API Key ID and API Key directly from your <Link href="/dashboard" className="font-medium underline underline-offset-4 hover:text-amber-900 dark:hover:text-amber-200">Notaify Dashboard</Link> after creating a project.
+                <p className="mt-2 text-sm leading-relaxed text-foreground/80">
+                    You can get your API Key ID and API Key directly from your <Link href="/dashboard" className="font-medium underline decoration-plum decoration-2 underline-offset-4">Notaify Dashboard</Link> after creating a project.
                 </p>
             </div>
 

@@ -86,12 +86,12 @@ export const GET = notaifyHandler(async (req) => {
           />
         </div>
 
-        <div className="not-prose my-6 rounded-lg border border-red-200 bg-red-50 p-6 dark:border-red-900/50 dark:bg-red-900/20">
+        <div className="not-prose my-6 rounded-2xl border border-destructive/30 bg-destructive/[0.06] p-5 sm:p-6">
           <div className="flex items-center gap-2 mb-2">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-red-600 dark:text-red-400"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" /><path d="M12 9v4" /><path d="M12 17h.01" /></svg>
-            <h3 className="text-lg font-semibold text-red-900 dark:text-red-300">Important Note for Next.js</h3>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-destructive"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" /><path d="M12 9v4" /><path d="M12 17h.01" /></svg>
+            <h3 className="font-display text-lg font-semibold tracking-tight text-foreground">Important Note for Next.js</h3>
           </div>
-          <p className="mt-2 text-sm text-red-800 dark:text-red-400">
+          <p className="mt-2 text-sm leading-relaxed text-foreground/80">
             Notaify <strong>only</strong> works server-side (Node.js runtimes). Never use it in client components or leak your credentials into the browser.
           </p>
         </div>

@@ -16,7 +16,7 @@ export function ThemeToggle() {
     if (!mounted) {
         // Prevent hydration mismatch — render a placeholder with same dimensions
         return (
-            <Button variant="ghost" size="icon" className="h-9 w-9" disabled>
+            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full" disabled>
                 <span className="h-4 w-4" />
             </Button>
         );
@@ -26,7 +26,7 @@ export function ThemeToggle() {
         <Button
             variant="ghost"
             size="icon"
-            className="h-9 w-9 text-muted-foreground hover:text-foreground transition-colors"
+            className="h-9 w-9 rounded-full text-muted-foreground hover:text-foreground transition-colors"
             onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
             aria-label={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
         >

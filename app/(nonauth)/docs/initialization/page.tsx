@@ -45,12 +45,12 @@ notaify.init({
                 </ul>
             </div>
 
-            <div className="not-prose my-8 rounded-lg border border-blue-200 bg-blue-50 p-6 dark:border-blue-900/50 dark:bg-blue-900/20">
+            <div className="not-prose my-8 rounded-2xl border border-signal/30 bg-signal-soft p-5 sm:p-6">
                 <div className="flex items-center gap-2 mb-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-blue-600 dark:text-blue-400"><circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" /></svg>
-                    <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-300">Is this safe to run in development?</h3>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-signal"><circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" /></svg>
+                    <h3 className="font-display text-lg font-semibold tracking-tight text-foreground">Is this safe to run in development?</h3>
                 </div>
-                <div className="mt-2 text-sm space-y-2 text-blue-800 dark:text-blue-400">
+                <div className="mt-2 space-y-2 text-sm leading-relaxed text-foreground/80">
                     <p>Yes. However, if you don&apos;t want to consume your quota during local testing, you can easily bypass initialization conditionally:</p>
                     <div className="mt-3">
                         <CodeBlock

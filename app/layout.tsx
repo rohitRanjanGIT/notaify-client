@@ -1,27 +1,28 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { GeistSans } from "geist/font/sans";
+import { GeistMono } from "geist/font/mono";
 import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import Header from "@/lib/components/hf/header";
-import Footer from "@/lib/components/hf/footer";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
-  title: "Notaify",
-  description: "Notaify - Deploy | Monitor | Notify.",
+  title: {
+    default: "Notaify — AI error alerts for Node.js backends",
+    template: "%s · Notaify",
+  },
+  description:
+    "Notaify captures runtime errors in your Node.js backend, explains the root cause with AI, and emails your team in seconds.",
   icons: {
     icon: "/favicon.ico",
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#fbfaf7" },
+    { media: "(prefers-color-scheme: dark)", color: "#121826" },
+  ],
 };
 
 export default function RootLayout({
@@ -31,9 +32,9 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-      <html lang="en">
+      <html lang="en" suppressHydrationWarning>
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+          className={`${GeistSans.variable} ${GeistMono.variable} antialiased`}
         >
           <ThemeProvider
             attribute="class"
